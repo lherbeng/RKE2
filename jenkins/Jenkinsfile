@@ -1,0 +1,18 @@
+pipeline {
+    agent {
+        label "workernode1-agent" // Replace with your agent label
+    }
+
+    environment {
+        JENKINS_SERVER = 'http://192.168.254.182' // Set your Jenkins server URL
+        JENKINS_PORT = '8080' // Set your Jenkins server port
+    }
+
+    stages {
+        stage('Install Jenkins Agent') {
+            steps {
+                sh './install-jenkins-agent.sh' // Specify the path to your Bash script
+            }
+        }
+    }
+}
