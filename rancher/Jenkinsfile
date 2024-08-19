@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        REPO_URL = 'https://github.com/yourusername/your-repo.git' // Replace with your actual repo
-        SCRIPT_PATH = 'install_rke2_server.sh'
+        REPO_URL = 'https://github.com/lherbeng/RKE2.git' // Replace with your actual repo
+        SCRIPT_PATH = 'rancher/install_rke2_server.sh'
     }
 
     stages {
