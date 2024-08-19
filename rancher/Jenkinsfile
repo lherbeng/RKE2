@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent { label 'agent1' }  // Specify the Jenkins node label here
 
     environment {
         REPO_URL = 'https://github.com/lherbeng/RKE2.git' // Replace with your actual repo
