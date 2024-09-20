@@ -29,7 +29,14 @@ if systemctl is-active --quiet rke2-server.service; then
 fi
 
 # Simlink all the things - kubectl
-sudo ln -s /var/lib/rancher/rke2/data/v1.28.12-rke2r1-aa38cd526ddb/bin/kubectl /usr/local/bin/kubectl
+# sudo ln -s /var/lib/rancher/rke2/data/v1.28.12-rke2r1-aa38cd526ddb/bin/kubectl /usr/local/bin/kubectl
+
+# Download the latest stable version of kubectl
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+
+# Move kubectl to /usr/local/bin and make it executable
+sudo mv kubectl /usr/local/bin/kubectl
+sudo chmod +x /usr/local/bin/kubectl
 
 # Add kubectl conf
 export KUBECONFIG=/etc/rancher/rke2/rke2.yaml
