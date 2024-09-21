@@ -4,7 +4,7 @@
 systemctl disable --now ufw
 
 # Run updates and upgrade and install packages
-# apt update
+apt update
 apt install nfs-common open-iscsi -y
 apt upgrade -y
 
