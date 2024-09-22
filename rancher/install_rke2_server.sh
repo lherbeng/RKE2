@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Stop Firewall
-systemctl disable --now ufw
+## systemctl disable --now ufw
 
 # Run updates and upgrade and install packages
 apt update
