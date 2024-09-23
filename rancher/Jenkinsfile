@@ -4,6 +4,15 @@ pipeline {
     environment {
         REPO_URL = 'https://github.com/lherbeng/RKE2.git' // Replace with your actual repo
         SCRIPT_PATH = 'rancher/install_rke2_server.sh'
+        UNINSTALL_SCRIPT_PATH = 'rancher/uninstall_rke2_server.sh' // Path to your uninstall script
+    }
+
+    parameters {
+        choice(
+            name: 'ACTION',
+            choices: ['install', 'uninstall'],
+            description: 'Choose whether to install or uninstall RKE2'
+        )
     }
 
     stages {
@@ -15,7 +24,13 @@ pipeline {
         }
 
         stage('Install RKE2 Server') {
+            when {
+                expression { params.ACTION == 'install' }  // Only run if "install" is chosen
+            }
             steps {
+                echo 'installing RKE2...'
+
+
                 // Provide execution permission to the script
                 sh 'chmod +x ${SCRIPT_PATH}'
                 
@@ -32,12 +47,40 @@ pipeline {
         }
     }
 
+    stage('Uninstall RKE2 Server') {
+            when {
+                expression { params.ACTION == 'uninstall' }  // Only run if "uninstall" is chosen
+            }
+            steps {
+                echo 'Uninstalling RKE2...'
+
+                // Provide execution permission to the uninstall script
+                sh 'chmod +x ${UNINSTALL_SCRIPT_PATH}'
+                
+                // Run the uninstall script
+                sh "./${UNINSTALL_SCRIPT_PATH}"
+            }
+        }
+    }
+
     post {
         success {
-            echo 'RKE2 Server installed successfully!'
+            script {
+                if (params.ACTION == 'install') {
+                    echo 'RKE2 Server installed successfully!'
+                } else if (params.ACTION == 'uninstall') {
+                    echo 'RKE2 Server uninstalled successfully!'
+                }
+            }
         }
         failure {
-            echo 'RKE2 Server installation failed.'
+            script {
+                if (params.ACTION == 'install') {
+                    echo 'RKE2 Server installation failed.'
+                } else if (params.ACTION == 'uninstall') {
+                    echo 'RKE2 Server uninstallation failed.'
+                }
+            }
         }
     }
 }
