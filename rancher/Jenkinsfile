@@ -3,8 +3,8 @@ pipeline {
 
     environment {
         REPO_URL = 'https://github.com/lherbeng/RKE2.git' // Replace with your actual repo
-        SCRIPT_PATH = 'rancher/install_rke2_server.sh'
-        UNINSTALL_SCRIPT_PATH = 'rancher/uninstall_rke2_server.sh' // Path to your uninstall script
+        INSTALL_SCRIPT_PATH = 'rancher/install_rke2_server.sh'
+        UNINSTALL_SCRIPT_PATH = 'rancher/uninstall_rke2_server.sh'
     }
 
     parameters {
@@ -28,26 +28,27 @@ pipeline {
                 expression { params.ACTION == 'install' }  // Only run if "install" is chosen
             }
             steps {
-                echo 'installing RKE2...'
+                echo 'Installing RKE2...'
 
-
-                // Provide execution permission to the script
-                sh 'chmod +x ${SCRIPT_PATH}'
+                // Provide execution permission to the install script
+                sh 'chmod +x ${INSTALL_SCRIPT_PATH}'
                 
-                // Run the script
-                sh "./${SCRIPT_PATH}"
+                // Run the install script
+                sh "./${INSTALL_SCRIPT_PATH}"
             }
         }
 
         stage('Verify RKE2 Installation') {
+            when {
+                expression { params.ACTION == 'install' }  // Only verify if "install" is chosen
+            }
             steps {
                 // Verify that RKE2 server is running and kubectl is working
                 sh 'kubectl get node -o wide || echo "kubectl not found or RKE2 server is not running."'
             }
         }
-    }
 
-    stage('Uninstall RKE2 Server') {
+        stage('Uninstall RKE2 Server') {
             when {
                 expression { params.ACTION == 'uninstall' }  // Only run if "uninstall" is chosen
             }
