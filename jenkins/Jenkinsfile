@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 pipeline {
     agent { label 'agent1' }  // Specify the Jenkins node label here
 
@@ -85,3 +86,6 @@ pipeline {
         }
     }
 }
+=======
+
+>>>>>>> 1b2256affa5279ccc00d27418b30b3a980207ab6
