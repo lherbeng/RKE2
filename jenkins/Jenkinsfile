@@ -2,8 +2,9 @@ pipeline {
     agent { label 'agent1' }  // Specify the Jenkins node label here
 
     environment {
-        REPO_URL = 'https://github.com/lherbeng/RKE2.git' // Replace with your actual repo
+        REPO_URL = 'https://github.com/lherbeng/RKE2.git'  // Replace with your actual repo
         SCRIPT_PATH = 'rancher/install_rke2_server.sh'
+        KUBECONFIG = '/etc/rancher/rke2/rke2.yaml'  // Explicitly define the KUBECONFIG for kubectl
     }
 
     stages {
@@ -17,17 +18,36 @@ pipeline {
         stage('Install RKE2 Server') {
             steps {
                 // Provide execution permission to the script
-                sh 'chmod +x ${SCRIPT_PATH}'
+                sh "chmod +x ${SCRIPT_PATH}"
                 
-                // Run the script
+                // Run the installation script
                 sh "./${SCRIPT_PATH}"
+            }
+        }
+
+        // Added stage to wait for RKE2 to fully start
+        stage('Wait for RKE2 to Start') {
+            steps {
+                script {
+                    // Wait for 30 seconds to ensure the RKE2 server is fully up
+                    echo "Waiting for RKE2 to fully start..."
+                    sleep 30
+                }
+            }
+        }
+
+        // Added stage to check the status of RKE2 service
+        stage('Check RKE2 Server Status') {
+            steps {
+                // Check if the RKE2 server service is running
+                sh 'systemctl status rke2-server.service || echo "RKE2 server is not running."'
             }
         }
 
         stage('Verify RKE2 Installation') {
             steps {
                 // Verify that RKE2 server is running and kubectl is working
-                sh 'kubectl get node -o wide || echo "kubectl not found or RKE2 server is not running."'
+                sh "kubectl --kubeconfig=${KUBECONFIG} get node -o wide || echo 'kubectl not found or RKE2 server is not running.'"
             }
         }
     }
