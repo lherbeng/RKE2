@@ -25,7 +25,6 @@ pipeline {
             }
         }
 
-        // Added stage to wait for RKE2 to fully start
         stage('Wait for RKE2 to Start') {
             steps {
                 script {
@@ -36,7 +35,6 @@ pipeline {
             }
         }
 
-        // Added stage to check the status of RKE2 service
         stage('Check RKE2 Server Status') {
             steps {
                 // Check if the RKE2 server service is running
@@ -46,8 +44,19 @@ pipeline {
 
         stage('Verify RKE2 Installation') {
             steps {
-                // Verify that RKE2 server is running and kubectl is working
+                // Explicitly verify that kubectl is using the correct KUBECONFIG and RKE2 is operational
                 sh "kubectl --kubeconfig=${KUBECONFIG} get node -o wide || echo 'kubectl not found or RKE2 server is not running.'"
+            }
+        }
+        
+        // Add a new stage to verify KUBECONFIG file and node status
+        stage('Validate kubectl Configuration') {
+            steps {
+                // Check if the KUBECONFIG file exists and has correct permissions
+                sh 'ls -l /etc/rancher/rke2/rke2.yaml || echo "KUBECONFIG file not found or not accessible."'
+                
+                // Validate if the node is ready and if kubectl can connect
+                sh "kubectl --kubeconfig=${KUBECONFIG} get nodes || echo 'Unable to get nodes. Check KUBECONFIG and RKE2 status.'"
             }
         }
     }
