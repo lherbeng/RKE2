@@ -38,7 +38,7 @@ sudo chmod 644 /etc/rancher/rke2/rke2.yaml
 
 # Append KUBECONFIG to .bashrc (in case of interactive use)
 echo 'export KUBECONFIG=/etc/rancher/rke2/rke2.yaml' >> ~/.bashrc
-source ~/.bashrc
+. ~/.bashrc
 
 # Check if kubectl works, with --kubeconfig explicitly in case env is not propagated
 kubectl --kubeconfig=/etc/rancher/rke2/rke2.yaml get node -o wide
