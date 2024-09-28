@@ -28,35 +28,27 @@ pipeline {
         stage('Wait for RKE2 to Start') {
             steps {
                 script {
-                    // Wait for 30 seconds to ensure the RKE2 server is fully up
+                    // Wait for 60 seconds to ensure the RKE2 server is fully up
                     echo "Waiting for RKE2 to fully start..."
-                    sleep 30
+                    sleep 60
                 }
             }
         }
 
-        stage('Check RKE2 Server Status') {
+        stage('Verify KUBECONFIG') {
             steps {
-                // Check if the RKE2 server service is running
-                sh 'systemctl status rke2-server.service || echo "RKE2 server is not running."'
+                // Verify that the KUBECONFIG file exists and has proper permissions
+                sh "ls -l ${KUBECONFIG} || echo 'KUBECONFIG file does not exist or is not accessible.'"
             }
         }
 
         stage('Verify RKE2 Installation') {
             steps {
-                // Explicitly verify that kubectl is using the correct KUBECONFIG and RKE2 is operational
-                sh "kubectl --kubeconfig=${KUBECONFIG} get node -o wide || echo 'kubectl not found or RKE2 server is not running.'"
-            }
-        }
-        
-        // Add a new stage to verify KUBECONFIG file and node status
-        stage('Validate kubectl Configuration') {
-            steps {
-                // Check if the KUBECONFIG file exists and has correct permissions
-                sh 'ls -l /etc/rancher/rke2/rke2.yaml || echo "KUBECONFIG file not found or not accessible."'
-                
-                // Validate if the node is ready and if kubectl can connect
-                sh "kubectl --kubeconfig=${KUBECONFIG} get nodes || echo 'Unable to get nodes. Check KUBECONFIG and RKE2 status.'"
+                // Set KUBECONFIG in the current shell and verify kubectl command
+                sh """
+                    export KUBECONFIG=${KUBECONFIG}
+                    kubectl get nodes -o wide || echo 'kubectl not found or RKE2 server is not running.'
+                """
             }
         }
     }
@@ -70,3 +62,4 @@ pipeline {
         }
     }
 }
+
