@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x  # Enable debugging
 
 # Stop Firewall
 systemctl disable --now ufw
@@ -32,9 +33,13 @@ curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stabl
 sudo mv kubectl /usr/local/bin/kubectl
 sudo chmod +x /usr/local/bin/kubectl
 
-# Add kubectl config
-export KUBECONFIG=/etc/rancher/rke2/rke2.yaml
+# Ensure permissions are correct
 sudo chmod 644 /etc/rancher/rke2/rke2.yaml
+
+# Add kubectl config
+# export KUBECONFIG=/etc/rancher/rke2/rke2.yaml
+# sudo chmod 644 /etc/rancher/rke2/rke2.yaml
+KUBECONFIG=/etc/rancher/rke2/rke2.yaml kubectl get nodes
 
 # Append KUBECONFIG to .bashrc (in case of interactive use)
 echo 'export KUBECONFIG=/etc/rancher/rke2/rke2.yaml' >> ~/.bashrc
