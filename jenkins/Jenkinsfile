@@ -14,11 +14,20 @@ pipeline {
             }
         }
 
+        stage('Validate Environment') {
+            steps {
+                sh """
+                    echo "Validating environment..."
+                    test -f ${SCRIPT_PATH} || (echo "Script not found at ${SCRIPT_PATH}!" && exit 1)
+                """
+            }
+        }
+
         stage('Source and Install RKE2') {
             steps {
-                // Source environment variables and install RKE2
                 sh """
-                    source ${SCRIPT_PATH}
+                    #!/bin/bash
+                    set -euxo pipefail
                     chmod +x ${SCRIPT_PATH}
                     ./${SCRIPT_PATH}
                 """
