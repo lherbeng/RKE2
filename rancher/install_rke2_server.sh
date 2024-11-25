@@ -34,7 +34,7 @@ sudo mv kubectl /usr/local/bin/kubectl
 sudo chmod +x /usr/local/bin/kubectl
 
 # Add kubectl config
-export KUBECONFIG=/etc/rancher/rke2/rke2.yaml
+# export KUBECONFIG=/etc/rancher/rke2/rke2.yaml
 sudo chmod 644 /etc/rancher/rke2/rke2.yaml
 kubectl get nodes
 
