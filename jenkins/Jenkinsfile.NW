@@ -1,0 +1,69 @@
+pipeline {
+    agent { label 'agent1' }
+
+    environment {
+        REPO_URL = 'https://github.com/lherbeng/RKE2.git'
+        SCRIPT_PATH = 'rancher/install_rke2_server.sh'
+        KUBECONFIG = '/etc/rancher/rke2/rke2.yaml'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git url: "${REPO_URL}", branch: 'main'
+            }
+        }
+
+        stage('Validate Environment') {
+            steps {
+                sh """
+                    echo "Validating environment..."
+                    test -f ${SCRIPT_PATH} || (echo "Script not found at ${SCRIPT_PATH}!" && exit 1)
+                """
+            }
+        }
+
+        stage('Source and Install RKE2') {
+            steps {
+                sh """
+                    #!/bin/bash
+                    set -euxo pipefail
+                    chmod +x ${SCRIPT_PATH}
+                    ./${SCRIPT_PATH}
+                """
+            }
+        }
+
+        stage('Wait for RKE2 to Start') {
+            steps {
+                script {
+                    echo "Waiting for RKE2 to fully start..."
+                    sleep 60
+                }
+            }
+        }
+
+        stage('Verify KUBECONFIG') {
+            steps {
+                sh "ls -l ${KUBECONFIG} || echo 'KUBECONFIG file does not exist or is not accessible.'"
+            }
+        }
+
+        stage('Verify RKE2 Installation') {
+            steps {
+                sh """
+                    kubectl get nodes -o wide || echo 'kubectl not found or RKE2 server is not running.'
+                """
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'RKE2 Server installed successfully!'
+        }
+        failure {
+            echo 'RKE2 Server installation failed.'
+        }
+    }
+}
