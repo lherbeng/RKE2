@@ -32,7 +32,7 @@ pipeline {
                 echo 'Installing RKE2...'
 
                 // Provide execution permission to the install script
-                sh 'chmod +x ${SCRIPT_PATH}'
+                sh "chmod +x ${INSTALL_SCRIPT_PATH}"
                 
                 // Run the install script
                 sh "bash -c 'source ${INSTALL_SCRIPT_PATH}'"
