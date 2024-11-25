@@ -34,7 +34,7 @@ pipeline {
                 sh 'chmod +x ${INSTALL_SCRIPT_PATH}'
                 
                 // Run the install script
-                sh "./${INSTALL_SCRIPT_PATH}"
+                sh "bash -c 'source ${INSTALL_SCRIPT_PATH} && env'"
             }
         }
 
