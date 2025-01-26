@@ -68,6 +68,13 @@ pipeline {
                             chmod +x ${SSL_SCRIPT_PATH}
                             ./${SSL_SCRIPT_PATH}
                         """
+                        echo 'Verifying SSL installation...'
+                        sh """
+                            if [ ! -f /etc/nginx/ssl/lgesite.com.crt ] || [ ! -f /etc/nginx/ssl/lgesite.com.key ]; then
+                                echo "Error: SSL certificate or key missing!" >&2
+                                exit 1
+                            fi
+                        """
                     }
                 }
             }
