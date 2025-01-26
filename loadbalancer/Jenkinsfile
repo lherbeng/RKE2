@@ -5,6 +5,7 @@ pipeline {
         REPO_URL = 'https://github.com/lherbeng/RKE2.git'  // Replace with your actual repo
         INSTALL_SCRIPT_PATH = 'loadbalancer/install_nginx.sh'
         UNINSTALL_SCRIPT_PATH = 'loadbalancer/uninstall_nginx.sh'
+        SSL_SCRIPT_PATH = 'loadbalancer/generate_ssl_with_logs.sh'
         NGINX_CONFIG = 'loadbalancer/nginx.conf'
     }
 
@@ -14,12 +15,18 @@ pipeline {
             choices: ['install', 'uninstall'],
             description: 'Choose whether to install or uninstall LoadBalancer'
         )
+        booleanParam(
+            name: 'ENABLE_SSL',
+            defaultValue: false,
+            description: 'Check to enable SSL installation'
+        )
     }
 
     stages {
         stage('Checkout') {
             steps {
-                // Checkout the code from GitHub
+                // Checkout the code from github
+                echo 'Checking out code from GitHub...'
                 git url: "${REPO_URL}", branch: 'main'
             }
         }
@@ -52,6 +59,17 @@ pipeline {
                     sudo nginx -t # Test the nginx configuration for syntax errors
                     sudo systemctl restart nginx # Restart NGINX to apply the changes
                 """
+
+                // Check if SSL should be installed
+                script {
+                    if (params.ENABLE_SSL) {
+                        echo 'Installing SSL...'
+                        sh """
+                            chmod +x ${SSL_SCRIPT_PATH}
+                            ./${SSL_SCRIPT_PATH}
+                        """
+                    }
+                }
             }
         }
 
