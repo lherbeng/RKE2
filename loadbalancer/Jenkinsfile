@@ -66,7 +66,7 @@ pipeline {
                         echo 'Installing SSL...'
                         sh """
                             set -e
-                            chmod +x ${SSL_SCRIPT_PATH}
+                            sudo chmod +x ${SSL_SCRIPT_PATH}
                             ./${SSL_SCRIPT_PATH}
                         """
                         
