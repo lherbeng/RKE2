@@ -65,15 +65,11 @@ pipeline {
                     if (params.ENABLE_SSL) {
                         echo 'Installing SSL...'
                         sh """
-                            echo "Current user: $(whoami)"
-                            echo "Contents of /etc/nginx/ssl before SSL generation:"
-                            ls -l /etc/nginx/ssl
-
                             echo "Running SSL script..."
                             sudo chmod +x ${SSL_SCRIPT_PATH}
                             sudo ./${SSL_SCRIPT_PATH}
 
-                            echo "Contents of /etc/nginx/ssl after SSL generation:"
+                            echo "Verifying SSL files..."
                             ls -l /etc/nginx/ssl
                         """
                         
