@@ -65,9 +65,16 @@ pipeline {
                     if (params.ENABLE_SSL) {
                         echo 'Installing SSL...'
                         sh """
-                            set -e
+                            echo "Current user: $(whoami)"
+                            echo "Contents of /etc/nginx/ssl before SSL generation:"
+                            ls -l /etc/nginx/ssl
+
+                            echo "Running SSL script..."
                             sudo chmod +x ${SSL_SCRIPT_PATH}
-                            ./${SSL_SCRIPT_PATH}
+                            sudo ./${SSL_SCRIPT_PATH}
+
+                            echo "Contents of /etc/nginx/ssl after SSL generation:"
+                            ls -l /etc/nginx/ssl
                         """
                         
                         echo 'Verifying SSL installation...'
@@ -76,6 +83,12 @@ pipeline {
                                 echo "Error: SSL certificate or key missing!" >&2
                                 exit 1
                             fi
+                        """
+                        
+                        echo "Testing NGINX configuration with SSL..."
+                        sh """
+                            sudo nginx -t
+                            sudo systemctl restart nginx
                         """
                     }
                 }
