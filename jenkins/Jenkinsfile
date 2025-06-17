@@ -2,13 +2,21 @@ pipeline {
     agent { label 'agent1' }
 
     environment {
-        REPO_URL = 'https://github.com/lherbeng/RKE2.git'  // Replace with your actual repo
-        INSTALL_SCRIPT_PATH = 'rancher/install_rke2_server.sh'
-        UNINSTALL_SCRIPT_PATH = 'rancher/uninstall_rke2_server.sh'
+        REPO_URL = 'https://github.com/lherbeng/RKE2.git'
+        INSTALL_SERVER_SCRIPT = 'rancher/install_rke2_server.sh'
+        UNINSTALL_SERVER_SCRIPT = 'rancher/uninstall_rke2_server.sh'
+        INSTALL_AGENT_SCRIPT = 'rancher/install_rke2_agent.sh'
+        UNINSTALL_AGENT_SCRIPT = 'rancher/uninstall_rke2_agent.sh'
         KUBECONFIG = '/etc/rancher/rke2/rke2.yaml'
     }
 
     parameters {
+        choice(
+            name: 'NODE_TYPE',
+            choices: ['server', 'agent'],
+            description: 'Select node type to manage'
+        )
+
         choice(
             name: 'ACTION',
             choices: ['install', 'uninstall'],
@@ -19,35 +27,35 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // Checkout the code from GitHub
                 git url: "${REPO_URL}", branch: 'main'
             }
         }
 
         stage('Install RKE2 Server') {
             when {
-                expression { params.ACTION == 'install' }  // Only run if "install" is chosen
+                allOf {
+                    expression { params.NODE_TYPE == 'server' }
+                    expression { params.ACTION == 'install' }
+                }
             }
             steps {
-                echo 'Installing RKE2...'
-
-                // Provide execution permission to the install script
-                sh "chmod +x ${INSTALL_SCRIPT_PATH}"
-
-                // Run the install script
-                sh "bash -c 'source ${INSTALL_SCRIPT_PATH}'"
+                echo 'Installing RKE2 Server...'
+                sh "chmod +x ${INSTALL_SERVER_SCRIPT}"
+                sh "bash -c 'source ${INSTALL_SERVER_SCRIPT}'"
             }
         }
 
-        stage('Verify RKE2 Installation') {
+        stage('Verify RKE2 Server Installation') {
             when {
-                expression { params.ACTION == 'install' }  // Only verify if "install" is chosen
+                allOf {
+                    expression { params.NODE_TYPE == 'server' }
+                    expression { params.ACTION == 'install' }
+                }
             }
             steps {
                 withEnv(["KUBECONFIG=${KUBECONFIG}"]) {
-                    // Verify that RKE2 server is running and kubectl is working
                     sh '''
-                       kubectl get node -o wide || echo "kubectl not found or RKE2 server is not running."
+                        kubectl get nodes -o wide || echo "kubectl not found or RKE2 server is not running."
                     '''
                 }
             }
@@ -55,38 +63,79 @@ pipeline {
 
         stage('Uninstall RKE2 Server') {
             when {
-                expression { params.ACTION == 'uninstall' }  // Only run if "uninstall" is chosen
+                allOf {
+                    expression { params.NODE_TYPE == 'server' }
+                    expression { params.ACTION == 'uninstall' }
+                }
             }
             steps {
-                echo 'Uninstalling RKE2...'
+                echo 'Uninstalling RKE2 Server...'
+                sh "chmod +x ${UNINSTALL_SERVER_SCRIPT}"
+                sh "./${UNINSTALL_SERVER_SCRIPT}"
+            }
+        }
 
-                // Provide execution permission to the uninstall script
-                sh "chmod +x ${UNINSTALL_SCRIPT_PATH}"
+        stage('Install RKE2 Agents (Parallel)') {
+            when {
+                allOf {
+                    expression { params.NODE_TYPE == 'agent' }
+                    expression { params.ACTION == 'install' }
+                }
+            }
+            steps {
+                script {
+                    def workerNodes = ['192.168.1.7', '192.168.1.8']  // Add your worker IPs here
 
-                // Run the uninstall script
-                sh "./${UNINSTALL_SCRIPT_PATH}"
+                    def parallelInstalls = [:]
+
+                    for (ip in workerNodes) {
+                        def nodeIp = ip
+                        parallelInstalls["Install on ${nodeIp}"] = {
+                            echo "Installing RKE2 Agent on ${nodeIp}..."
+                            sh "chmod +x ${INSTALL_AGENT_SCRIPT}"
+                            sh "ssh root@${nodeIp} 'bash -s' < ${INSTALL_AGENT_SCRIPT}"
+                        }
+                    }
+
+                    parallel parallelInstalls
+                }
+            }
+        }
+
+        stage('Uninstall RKE2 Agents (Parallel)') {
+            when {
+                allOf {
+                    expression { params.NODE_TYPE == 'agent' }
+                    expression { params.ACTION == 'uninstall' }
+                }
+            }
+            steps {
+                script {
+                    def workerNodes = ['192.168.1.6', '192.168.1.7']  // Add your worker IPs here
+
+                    def parallelUninstalls = [:]
+
+                    for (ip in workerNodes) {
+                        def nodeIp = ip
+                        parallelUninstalls["Uninstall on ${nodeIp}"] = {
+                            echo "Uninstalling RKE2 Agent from ${nodeIp}..."
+                            sh "chmod +x ${UNINSTALL_AGENT_SCRIPT}"
+                            sh "ssh root@${nodeIp} 'bash -s' < ${UNINSTALL_AGENT_SCRIPT}"
+                        }
+                    }
+
+                    parallel parallelUninstalls
+                }
             }
         }
     }
 
     post {
         success {
-            script {
-                if (params.ACTION == 'install') {
-                    echo 'RKE2 Server installed successfully!'
-                } else if (params.ACTION == 'uninstall') {
-                    echo 'RKE2 Server uninstalled successfully!'
-                }
-            }
+            echo "✅ ${params.NODE_TYPE} ${params.ACTION} completed successfully."
         }
         failure {
-            script {
-                if (params.ACTION == 'install') {
-                    echo 'RKE2 Server installation failed.'
-                } else if (params.ACTION == 'uninstall') {
-                    echo 'RKE2 Server uninstallation failed.'
-                }
-            }
+            echo "❌ ${params.NODE_TYPE} ${params.ACTION} failed."
         }
     }
 }
