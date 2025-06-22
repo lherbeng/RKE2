@@ -8,7 +8,6 @@ pipeline {
         INSTALL_AGENT_SCRIPT = 'rancher/install_rke2_agent.sh'
         UNINSTALL_AGENT_SCRIPT = 'rancher/uninstall_rke2_agent.sh'
         KUBECONFIG = '/etc/rancher/rke2/rke2.yaml'
-        MASTER_IP = '192.168.1.5' // Replace with your actual RKE2 master IP
     }
 
     parameters {
@@ -54,13 +53,8 @@ pipeline {
                 }
             }
             steps {
-                withEnv(["KUBECONFIG=${KUBECONFIG}", "MASTER_IP=${MASTER_IP}"]) {
+                withEnv(["KUBECONFIG=${KUBECONFIG}"]) {
                     sh '''
-                        echo "Patching kubeconfig to use actual master IP: $MASTER_IP"
-                        sed -i "s/127.0.0.1/${MASTER_IP}/g" $KUBECONFIG
-
-                        echo "Verifying RKE2 server node status..."
-                        grep server $KUBECONFIG
                         kubectl get nodes -o wide || echo "kubectl not found or RKE2 server is not running."
                     '''
                 }
