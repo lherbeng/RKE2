@@ -70,7 +70,8 @@ pipeline {
             }
             steps {
                 sh '''
-                    source rancher/set_kubeconfig.sh
+                    chmod +x rancher/set_kubeconfig.sh
+                    . rancher/set_kubeconfig.sh
                     kubectl get nodes -o wide || echo "kubectl failed or server not ready."
                 '''
             }
