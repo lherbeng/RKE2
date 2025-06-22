@@ -7,7 +7,7 @@ pipeline {
         UNINSTALL_SERVER_SCRIPT = 'rancher/uninstall_rke2_server.sh'
         INSTALL_AGENT_SCRIPT = 'rancher/install_rke2_agent.sh'
         UNINSTALL_AGENT_SCRIPT = 'rancher/uninstall_rke2_agent.sh'
-        SET_KUBECONFIG_SCRIPT = 'rancher/set_kubeconfig.sh'  // 👈 added this
+        KUBECONFIG = '/etc/rancher/rke2/rke2.yaml'
     }
 
     parameters {
@@ -41,23 +41,7 @@ pipeline {
             steps {
                 echo 'Installing RKE2 Server...'
                 sh "chmod +x ${INSTALL_SERVER_SCRIPT}"
-                sh "./${INSTALL_SERVER_SCRIPT}"
-            }
-        }
-
-        stage('Set KUBECONFIG') {
-            when {
-                allOf {
-                    expression { params.NODE_TYPE == 'server' }
-                    expression { params.ACTION == 'install' }
-                }
-            }
-            steps {
-                echo 'Setting KUBECONFIG environment...'
-                sh '''
-                    chmod +x ${SET_KUBECONFIG_SCRIPT}
-                    source ${SET_KUBECONFIG_SCRIPT}
-                '''
+                sh "bash -c 'source ${INSTALL_SERVER_SCRIPT}'"
             }
         }
 
@@ -69,10 +53,11 @@ pipeline {
                 }
             }
             steps {
-                sh '''
-                    source rancher/set_kubeconfig.sh
-                    kubectl get nodes -o wide || echo "kubectl failed or server not ready."
-                '''
+                withEnv(["KUBECONFIG=${KUBECONFIG}"]) {
+                    sh '''
+                        kubectl get nodes -o wide || echo "kubectl not found or RKE2 server is not running."
+                    '''
+                }
             }
         }
 
@@ -99,7 +84,7 @@ pipeline {
             }
             steps {
                 script {
-                    def workerNodes = ['192.168.1.7', '192.168.1.8']
+                    def workerNodes = ['192.168.1.7', '192.168.1.8']  // Add your worker IPs here
 
                     def parallelInstalls = [:]
 
@@ -126,7 +111,7 @@ pipeline {
             }
             steps {
                 script {
-                    def workerNodes = ['192.168.1.7', '192.168.1.8']
+                    def workerNodes = ['192.168.1.7', '192.168.1.8']  // Add your worker IPs here
 
                     def parallelUninstalls = [:]
 
