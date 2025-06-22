@@ -7,7 +7,7 @@ pipeline {
         UNINSTALL_SERVER_SCRIPT = 'rancher/uninstall_rke2_server.sh'
         INSTALL_AGENT_SCRIPT = 'rancher/install_rke2_agent.sh'
         UNINSTALL_AGENT_SCRIPT = 'rancher/uninstall_rke2_agent.sh'
-        SET_KUBECONFIG_SCRIPT = 'rancher/set_kubeconfig.sh'
+        KUBECONFIG = '/etc/rancher/rke2/rke2.yaml'
     }
 
     parameters {
@@ -41,7 +41,7 @@ pipeline {
             steps {
                 echo 'Installing RKE2 Server...'
                 sh "chmod +x ${INSTALL_SERVER_SCRIPT}"
-                sh "./${INSTALL_SERVER_SCRIPT}"
+                sh "bash -c 'source ${INSTALL_SERVER_SCRIPT}'"
             }
         }
 
@@ -53,11 +53,11 @@ pipeline {
                 }
             }
             steps {
-                sh """
-                    chmod +x ${SET_KUBECONFIG_SCRIPT}
-                    . ${SET_KUBECONFIG_SCRIPT}
-                    kubectl get nodes -o wide || echo "kubectl not found or RKE2 server is not running."
-                """
+                withEnv(["KUBECONFIG=${KUBECONFIG}"]) {
+                    sh '''
+                        kubectl get nodes -o wide || echo "kubectl not found or RKE2 server is not running."
+                    '''
+                }
             }
         }
 
