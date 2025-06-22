@@ -19,12 +19,24 @@ curl -sfL https://get.rke2.io | INSTALL_RKE2_TYPE=server sh -
 systemctl enable rke2-server.service
 systemctl start rke2-server.service
 
-# Wait for RKE2 Server to be fully up
+# Wait until RKE2 service is active
 while ! systemctl is-active --quiet rke2-server.service; do
-    echo "Waiting for RKE2 Server to be up..."
+    echo "Waiting for RKE2 service to be active..."
     sleep 5
 done
-echo "RKE2 Server is running."
+echo "RKE2 service is active."
+
+# Wait until Kubernetes API server is fully ready
+echo "Waiting for Kubernetes API to become available..."
+until /var/lib/rancher/rke2/bin/kubectl --kubeconfig=/etc/rancher/rke2/rke2.yaml get node &>/dev/null; do
+    sleep 5
+    echo "Still waiting for Kubernetes API..."
+done
+echo "✅ Kubernetes API is ready."
+
+# Patch the kubeconfig: Replace 127.0.0.1 with real IP
+MASTER_IP=$(hostname -I | awk '{print $1}')
+sed -i "s/127.0.0.1/${MASTER_IP}/g" /etc/rancher/rke2/rke2.yaml
 
 # Download the latest stable version of kubectl
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
@@ -33,17 +45,19 @@ curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stabl
 sudo mv kubectl /usr/local/bin/kubectl
 sudo chmod +x /usr/local/bin/kubectl
 
-# Add kubectl config
-# export KUBECONFIG=/etc/rancher/rke2/rke2.yaml
+# Set permission on kubeconfig
 sudo chmod 644 /etc/rancher/rke2/rke2.yaml
-kubectl get nodes
 
-# Append KUBECONFIG to .bashrc (in case of interactive use)
+# Export KUBECONFIG for current session
+export KUBECONFIG=/etc/rancher/rke2/rke2.yaml
+
+# Append KUBECONFIG to .bashrc (for future sessions)
 echo 'export KUBECONFIG=/etc/rancher/rke2/rke2.yaml' >> ~/.bashrc
 . ~/.bashrc
 
-# Check if kubectl works, with --kubeconfig explicitly in case env is not propagated
-kubectl --kubeconfig=/etc/rancher/rke2/rke2.yaml get node -o wide
+# Check if kubectl works
+kubectl get nodes || echo "❌ kubectl failed."
+kubectl --kubeconfig=/etc/rancher/rke2/rke2.yaml get node -o wide || echo "❌ explicit kubeconfig failed."
 
 # Get server IP address Of RKE2 Server
 ip addr | grep inet

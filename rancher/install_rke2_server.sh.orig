@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x  # Enable debugging
 
 # Stop Firewall
 systemctl disable --now ufw
@@ -14,22 +15,16 @@ apt autoremove -y
 # Install RKE2 server
 curl -sfL https://get.rke2.io | INSTALL_RKE2_TYPE=server sh -
 
-# For specific RKE2 Server version
-# curl -sfL https://get.rke2.io | INSTALL_RKE2_CHANNEL=v1.26 INSTALL_RKE2_TYPE=server sh -
-
 # Enable and start RKE2 Server service
 systemctl enable rke2-server.service
 systemctl start rke2-server.service
 
-# Check if RKE2 Service is running (non-blocking)
-if systemctl is-active --quiet rke2-server.service; then
-            echo "RKE2 Server is running."
-    else
-                echo "RKE2 Server is not running."
-fi
-
-# Simlink all the things - kubectl
-# sudo ln -s /var/lib/rancher/rke2/data/v1.28.12-rke2r1-aa38cd526ddb/bin/kubectl /usr/local/bin/kubectl
+# Wait for RKE2 Server to be fully up
+while ! systemctl is-active --quiet rke2-server.service; do
+    echo "Waiting for RKE2 Server to be up..."
+    sleep 5
+done
+echo "RKE2 Server is running."
 
 # Download the latest stable version of kubectl
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
@@ -38,17 +33,17 @@ curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stabl
 sudo mv kubectl /usr/local/bin/kubectl
 sudo chmod +x /usr/local/bin/kubectl
 
-# Add kubectl conf
-export KUBECONFIG=/etc/rancher/rke2/rke2.yaml
+# Add kubectl config
+# export KUBECONFIG=/etc/rancher/rke2/rke2.yaml
+sudo chmod 644 /etc/rancher/rke2/rke2.yaml
+kubectl get nodes
 
-# Append export KUBECONFIG to .bashrc
+# Append KUBECONFIG to .bashrc (in case of interactive use)
 echo 'export KUBECONFIG=/etc/rancher/rke2/rke2.yaml' >> ~/.bashrc
-
-# Apply the changes to the current shell session
 . ~/.bashrc
 
-# check if kubectl works
-kubectl get node -o wide
+# Check if kubectl works, with --kubeconfig explicitly in case env is not propagated
+kubectl --kubeconfig=/etc/rancher/rke2/rke2.yaml get node -o wide
 
 # Get server IP address Of RKE2 Server
 ip addr | grep inet
