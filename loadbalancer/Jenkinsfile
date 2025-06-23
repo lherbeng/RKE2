@@ -62,24 +62,35 @@ pipeline {
                 script {
                     if (params.ENABLE_SSL || params.ENABLE_SSL_WITH_LOGS) {
                         def selectedScript = params.ENABLE_SSL_WITH_LOGS ? SSL_LOG_SCRIPT_PATH : SSL_SCRIPT_PATH
-                        echo "Running ${selectedScript}..."
 
+                        echo "Preparing to run: ${selectedScript}"
+
+                        // Ensure target directory exists
+                        sh "sudo mkdir -p /etc/nginx/ssl"
+
+                        // Make script executable and run it
                         sh """
                             sudo chmod +x ${selectedScript}
-                            sudo ./${selectedScript}
-
-                            echo "Verifying SSL files..."
-                            ls -l /etc/nginx/ssl
+                            sudo -E ./${selectedScript}
                         """
 
+                        // Debugging: Show current directory and files
                         sh """
+                            echo "Current directory: \$(pwd)"
+                            echo "Contents of loadbalancer/:"
+                            ls -l loadbalancer/
+
+                            echo "Contents of /etc/nginx/ssl:"
+                            sudo ls -l /etc/nginx/ssl || echo "SSL folder not found"
+
+                            echo "Checking for SSL cert and key..."
                             if [ ! -f /etc/nginx/ssl/lgesite.com.crt ] || [ ! -f /etc/nginx/ssl/lgesite.com.key ]; then
-                                echo "Error: SSL certificate or key missing!" >&2
+                                echo "❌ ERROR: SSL certificate or key is missing!" >&2
                                 exit 1
                             fi
                         """
 
-                        echo "Testing NGINX configuration with SSL..."
+                        echo "Re-testing NGINX configuration after SSL setup..."
                         sh """
                             sudo nginx -t
                             sudo systemctl restart nginx
@@ -104,12 +115,12 @@ pipeline {
     post {
         success {
             script {
-                echo "NGINX service ${params.ACTION} completed successfully!"
+                echo "✅ NGINX service ${params.ACTION} completed successfully!"
             }
         }
         failure {
             script {
-                echo "NGINX service ${params.ACTION} failed!"
+                echo "❌ NGINX service ${params.ACTION} failed!"
             }
         }
     }
