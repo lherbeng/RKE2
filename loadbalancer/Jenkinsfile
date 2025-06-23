@@ -31,7 +31,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                echo '📦 Checking out code from GitHub...'
+                echo 'Checking out code from GitHub...'
                 git url: "${REPO_URL}", branch: 'main'
             }
         }
@@ -41,7 +41,7 @@ pipeline {
                 expression { params.ACTION == 'install' }
             }
             steps {
-                echo '🔧 Installing NGINX...'
+                echo 'Installing NGINX...'
 
                 sh "chmod +x ${INSTALL_SCRIPT_PATH}"
                 sh "./${INSTALL_SCRIPT_PATH}"
@@ -58,7 +58,7 @@ pipeline {
                     if (params.ENABLE_SSL || params.ENABLE_SSL_WITH_LOGS) {
                         def selectedScript = params.ENABLE_SSL_WITH_LOGS ? SSL_LOG_SCRIPT_PATH : SSL_SCRIPT_PATH
 
-                        echo "🔐 Running SSL script: ${selectedScript}"
+                        echo "Running SSL script: ${selectedScript}"
 
                         sh """
                             sudo mkdir -p /etc/nginx/ssl
@@ -66,32 +66,32 @@ pipeline {
                             sudo -E ./${selectedScript}
                         """
 
-                        // 🧪 Add deep SSL validation & debug output
+                        // Add deep SSL validation & debug output
                         sh """
-                            echo '📍 Jenkins workspace:'
+                            echo 'Jenkins workspace:'
                             pwd
-                            echo '📁 Listing workspace contents...'
+                            echo 'Listing workspace contents...'
                             ls -l
 
-                            echo '📁 Listing /etc/nginx/ssl contents...'
-                            sudo ls -l /etc/nginx/ssl || echo '❌ /etc/nginx/ssl not found'
+                            echo 'Listing /etc/nginx/ssl contents...'
+                            sudo ls -l /etc/nginx/ssl || echo '/etc/nginx/ssl not found'
 
-                            echo '🧾 Preview SSL certificate content:'
-                            sudo head -n 5 /etc/nginx/ssl/lgesite.com.crt || echo '❌ CRT file missing or unreadable'
+                            echo 'Preview SSL certificate content:'
+                            sudo head -n 5 /etc/nginx/ssl/lgesite.com.crt || echo 'CRT file missing or unreadable'
 
-                            echo '🧾 Preview SSL key content:'
-                            sudo head -n 5 /etc/nginx/ssl/lgesite.com.key || echo '❌ KEY file missing or unreadable'
+                            echo 'Preview SSL key content:'
+                            sudo head -n 5 /etc/nginx/ssl/lgesite.com.key || echo 'KEY file missing or unreadable'
 
-                            echo '✅ Verifying file existence...'
+                            echo 'Verifying file existence...'
                             if [ ! -f /etc/nginx/ssl/lgesite.com.crt ] || [ ! -f /etc/nginx/ssl/lgesite.com.key ]; then
-                                echo '❌ ERROR: Missing SSL cert or key file!' >&2
+                                echo 'ERROR: Missing SSL cert or key file!' >&2
                                 exit 1
                             fi
                         """
                     }
                 }
 
-                echo "🚀 Testing and restarting NGINX after SSL is in place..."
+                echo "Testing and restarting NGINX after SSL is in place..."
                 sh """
                     sudo nginx -t
                     sudo systemctl restart nginx
@@ -104,7 +104,7 @@ pipeline {
                 expression { params.ACTION == 'uninstall' }
             }
             steps {
-                echo '🧹 Uninstalling NGINX...'
+                echo 'Uninstalling NGINX...'
                 sh "chmod +x ${UNINSTALL_SCRIPT_PATH}"
                 sh "./${UNINSTALL_SCRIPT_PATH}"
             }
@@ -114,12 +114,12 @@ pipeline {
     post {
         success {
             script {
-                echo "✅ NGINX service ${params.ACTION} completed successfully!"
+                echo "NGINX service ${params.ACTION} completed successfully!"
             }
         }
         failure {
             script {
-                echo "❌ NGINX service ${params.ACTION} failed!"
+                echo "NGINX service ${params.ACTION} failed!"
             }
         }
     }
