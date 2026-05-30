@@ -1,4 +1,4 @@
-To show all pods running in the kube-system namespace, execute the following command:
+<font color="red">To show all pods running in the kube-system namespace, execute the following command:</font>
 
 `kubectl get pods -n kube-system`
 
