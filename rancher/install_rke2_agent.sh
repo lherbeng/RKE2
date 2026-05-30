@@ -13,7 +13,7 @@ apt upgrade -y
 apt autoremove -y
 
 # Define master node IP and user
-MASTER_IP="192.168.1.5"
+MASTER_IP="192.168.254.5"
 MASTER_USER="root"
 
 # Install RKE2 Agent
