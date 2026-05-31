@@ -4,6 +4,20 @@ To show all pods running in the kube-system namespace, execute the following com
 
 <img width="683" height="493" alt="image" src="https://github.com/user-attachments/assets/8a6d46f2-ddfd-40c9-960a-679b020bc4cf" />
 
+## **cloud-controller-manager-masternode**
+
+The cloud-controller-manager is a Kubernetes control plane component that integrates the cluster with a cloud provider (or infrastructure layer). It runs controllers that interact with external resources like nodes, load balancers, and storage provided by the cloud or environment.
+
+What it does:
+Manages node lifecycle
+Detects when nodes are added or removed
+Handles service load balancers
+Creates and manages external load balancers (if supported)
+Manages route information
+Ensures network routing is correctly configured
+Integrates cloud-specific resources
+Works with infrastructure outside Kubernetes
+
 
 ## **etcd-masternode**
 
