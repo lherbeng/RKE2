@@ -3,11 +3,13 @@ pipeline {
 
     environment {
         REPO_URL = 'https://github.com/lherbeng/RKE2.git'
-        INSTALL_SCRIPT_PATH = 'loadbalancer/install_nginx.sh'
-        UNINSTALL_SCRIPT_PATH = 'loadbalancer/uninstall_nginx.sh'
-        SSL_SCRIPT_PATH = 'loadbalancer/generate_ssl.sh'
-        SSL_LOG_SCRIPT_PATH = 'loadbalancer/generate_ssl_with_logs.sh'
-        NGINX_CONFIG = 'loadbalancer/nginx.conf'
+        BASE_DIR = 'infra/loadbalancer'
+
+        INSTALL_SCRIPT_PATH = "${BASE_DIR}/scripts/install_nginx.sh"
+        UNINSTALL_SCRIPT_PATH = "${BASE_DIR}/scripts/uninstall_nginx.sh"
+        SSL_SCRIPT_PATH = "${BASE_DIR}/ssl/generate_ssl.sh"
+        SSL_LOG_SCRIPT_PATH = "${BASE_DIR}/ssl/generate_ssl_with_logs.sh"
+        NGINX_CONFIG = "${BASE_DIR}/nginx/nginx.conf"
     }
 
     parameters {
@@ -64,7 +66,7 @@ pipeline {
                             sudo mkdir -p /etc/nginx/ssl
                             sudo chmod +x ${selectedScript}
                             sudo -E ./${selectedScript}
-                        """
+                        """/
 
                         // Add deep SSL validation & debug output
                         sh """
