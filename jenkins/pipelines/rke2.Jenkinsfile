@@ -1,6 +1,11 @@
 pipeline {
     agent none
 
+    options { 
+        timestamps() 
+        disableConcurrentBuilds() 
+        buildDiscarder(logRotator(numToKeepStr: '20')) }
+
     environment {
         REPO_URL = 'https://github.com/lherbeng/RKE2.git'
         BASE_DIR = 'infra/rke2'
