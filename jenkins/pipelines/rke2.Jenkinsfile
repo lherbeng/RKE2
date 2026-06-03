@@ -3,8 +3,7 @@ pipeline {
 
     options { 
         timestamps() 
-        disableConcurrentBuilds() 
-        skipDefaultCheckout(true) 
+        disableConcurrentBuilds()  
         buildDiscarder(logRotator(numToKeepStr: '20')) }
 
     environment {
