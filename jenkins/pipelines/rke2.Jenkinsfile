@@ -10,8 +10,7 @@ pipeline {
         INSTALL_AGENT_SCRIPT = "${BASE_DIR}/install-agent.sh"
         UNINSTALL_AGENT_SCRIPT = "${BASE_DIR}/uninstall-agent.sh"
 
-        // FIX ONLY THIS LINE (workspace kubeconfig instead of system file)
-        KUBECONFIG = "${WORKSPACE}/kubeconfig.yaml"
+        KUBECONFIG = '/etc/rancher/rke2/rke2.yaml'
     }
 
     parameters {
@@ -61,14 +60,12 @@ pipeline {
 
                 stage('Verify Server') {
                     steps {
-                        sh """
-                            sudo cp /etc/rancher/rke2/rke2.yaml $WORKSPACE/kubeconfig.yaml
-                            sudo chown \$(id -u):\$(id -g) $WORKSPACE/kubeconfig.yaml
-
-                            export KUBECONFIG=$WORKSPACE/kubeconfig.yaml
-                            kubectl get nodes -o wide || \
-                            echo "kubectl not found or RKE2 server is not running."
-                        """
+                        withEnv(["KUBECONFIG=${KUBECONFIG}"]) {
+                            sh '''
+                                kubectl get nodes -o wide || \
+                                echo "kubectl not found or RKE2 server is not running."
+                            '''
+                        }
                     }
                 }
             }
