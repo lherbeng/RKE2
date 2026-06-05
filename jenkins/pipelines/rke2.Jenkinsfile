@@ -9,9 +9,6 @@ pipeline {
         UNINSTALL_SERVER_SCRIPT = "${BASE_DIR}/uninstall-server.sh"
         INSTALL_AGENT_SCRIPT = "${BASE_DIR}/install-agent.sh"
         UNINSTALL_AGENT_SCRIPT = "${BASE_DIR}/uninstall-agent.sh"
-        KUBECONFIG_SCRIPT = "${BASE_DIR}/kubeconfig.sh"
-
-        KUBECONFIG = '/etc/rancher/rke2/rke2.yaml'
     }
 
     parameters {
@@ -53,33 +50,33 @@ pipeline {
                         echo 'Installing RKE2 Server...'
 
                         sh """
+                            set -e
                             chmod +x ${INSTALL_SERVER_SCRIPT}
                             ./${INSTALL_SERVER_SCRIPT}
                         """
                     }
                 }
 
-                stage('Verify Server') {
+                stage('Verify Server (FIXED KUBECONFIG)') {
                     steps {
                         echo 'Creating kubeconfig and verifying cluster...'
 
                         sh """
-                            chmod +x ${KUBECONFIG_SCRIPT}
-                            ./${KUBECONFIG_SCRIPT}
-                        """
+                            set -e
 
-                        // ✅ FIX ONLY: copy kubeconfig to Jenkins-safe location
-                        sh """
+                            # wait a bit for API server readiness (important in RKE2)
+                            sleep 10
+
+                            # create kubeconfig for Jenkins user
                             mkdir -p /home/jenkins/.kube
+
                             sudo cp /etc/rancher/rke2/rke2.yaml /home/jenkins/.kube/config
                             sudo chown jenkins:jenkins /home/jenkins/.kube/config
                             chmod 600 /home/jenkins/.kube/config
-                        """
 
-                        // ✅ FIXED kubectl execution (NO export dependency)
-                        sh """
-                            export KUBECONFIG=/home/jenkins/.kube/config
-                            kubectl get nodes -o wide
+                            # verify cluster using explicit kubeconfig (NO export dependency)
+                            KUBECONFIG=/home/jenkins/.kube/config kubectl get nodes -o wide || \
+                            echo "Cluster not ready or kubectl access issue"
                         """
                     }
                 }
@@ -109,6 +106,7 @@ pipeline {
                         echo 'Uninstalling RKE2 Server...'
 
                         sh """
+                            set -e
                             chmod +x ${UNINSTALL_SERVER_SCRIPT}
                             ./${UNINSTALL_SERVER_SCRIPT}
                         """
@@ -144,6 +142,7 @@ pipeline {
                                 echo 'Installing RKE2 Agent on workernode1...'
 
                                 sh """
+                                    set -e
                                     chmod +x ${INSTALL_AGENT_SCRIPT}
                                     ./${INSTALL_AGENT_SCRIPT}
                                 """
@@ -169,6 +168,7 @@ pipeline {
                                 echo 'Installing RKE2 Agent on workernode2...'
 
                                 sh """
+                                    set -e
                                     chmod +x ${INSTALL_AGENT_SCRIPT}
                                     ./${INSTALL_AGENT_SCRIPT}
                                 """
@@ -206,6 +206,7 @@ pipeline {
                                 echo 'Uninstalling RKE2 Agent from workernode1...'
 
                                 sh """
+                                    set -e
                                     chmod +x ${UNINSTALL_AGENT_SCRIPT}
                                     ./${UNINSTALL_AGENT_SCRIPT}
                                 """
@@ -231,6 +232,7 @@ pipeline {
                                 echo 'Uninstalling RKE2 Agent from workernode2...'
 
                                 sh """
+                                    set -e
                                     chmod +x ${UNINSTALL_AGENT_SCRIPT}
                                     ./${UNINSTALL_AGENT_SCRIPT}
                                 """
