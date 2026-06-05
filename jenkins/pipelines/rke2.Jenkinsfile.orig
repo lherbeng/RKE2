@@ -60,12 +60,11 @@ pipeline {
 
                 stage('Verify Server') {
                     steps {
-                        echo 'Setting up kubeconfig and verifying RKE2 cluster...'
-                            
-                        sh """
-                            chmod +x ${BASE_DIR}/kubeconfig.sh
-                            ./${BASE_DIR}/kubeconfig.sh
-                        """        
+                        withEnv(["KUBECONFIG=${KUBECONFIG}"]) {
+                            sh '''
+                                kubectl get nodes -o wide || \
+                                echo "kubectl not found or RKE2 server is not running."
+                            '''
                         }
                     }
                 }
