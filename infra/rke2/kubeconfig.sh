@@ -1,14 +1,12 @@
 #!/bin/bash
 set -e
 
-echo "Waiting for RKE2..."
-sleep 30
+echo "Configuring default kubeconfig..."
 
-KCFG="$HOME/kubeconfig.yaml"
+mkdir -p ~/.kube
+cp /etc/rancher/rke2/rke2.yaml ~/.kube/config
+chmod 600 ~/.kube/config
 
-sudo cp /etc/rancher/rke2/rke2.yaml "$KCFG"
-sudo chown $(id -u):$(id -g) "$KCFG"
+echo "Testing kubectl..."
 
-echo "Using kubeconfig: $KCFG"
-
-KUBECONFIG="$KCFG" kubectl get nodes -o wide
+kubectl get nodes

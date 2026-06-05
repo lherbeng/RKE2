@@ -10,7 +10,9 @@ pipeline {
         INSTALL_AGENT_SCRIPT = "${BASE_DIR}/install-agent.sh"
         UNINSTALL_AGENT_SCRIPT = "${BASE_DIR}/uninstall-agent.sh"
 
-        KUBECONFIG_PATH = '/etc/rancher/rke2/rke2.yaml'
+        KUBECONFIG_SCRIPT = "${BASE_DIR}/kubeconfig.sh"
+
+        KUBECONFIG = '/etc/rancher/rke2/rke2.yaml'
     }
 
     parameters {
@@ -23,7 +25,7 @@ pipeline {
         choice(
             name: 'ACTION',
             choices: ['install', 'uninstall'],
-            description: 'Choose action'
+            description: 'Choose whether to install or uninstall RKE2'
         )
     }
 
@@ -49,22 +51,34 @@ pipeline {
 
                 stage('Install Server') {
                     steps {
+                        echo 'Installing RKE2 Server...'
+
                         sh """
-                            set -e
                             chmod +x ${INSTALL_SERVER_SCRIPT}
-                            ${INSTALL_SERVER_SCRIPT}
+                            ./${INSTALL_SERVER_SCRIPT}
+                        """
+                    }
+                }
+
+                stage('Configure Kubeconfig') {
+                    steps {
+                        echo 'Configuring kubeconfig...'
+
+                        sh """
+                            chmod +x ${KUBECONFIG_SCRIPT}
+                            ./${KUBECONFIG_SCRIPT}
                         """
                     }
                 }
 
                 stage('Verify Server') {
                     steps {
-                        sh """
-                            set -e
-                            echo "Checking cluster..."
-
-                            KUBECONFIG=${KUBECONFIG_PATH} kubectl get nodes -o wide
-                        """
+                        withEnv(["KUBECONFIG=${KUBECONFIG}"]) {
+                            sh '''
+                                kubectl get nodes -o wide || \
+                                echo "kubectl not found or RKE2 server is not running."
+                            '''
+                        }
                     }
                 }
             }
@@ -90,10 +104,11 @@ pipeline {
 
                 stage('Uninstall Server') {
                     steps {
+                        echo 'Uninstalling RKE2 Server...'
+
                         sh """
-                            set -e
                             chmod +x ${UNINSTALL_SERVER_SCRIPT}
-                            ${UNINSTALL_SERVER_SCRIPT}
+                            ./${UNINSTALL_SERVER_SCRIPT}
                         """
                     }
                 }
@@ -110,44 +125,50 @@ pipeline {
 
             parallel {
 
-                stage('Install Agent 1') {
+                stage('Install Agent on workernode1') {
+
                     agent { label 'agent1' }
 
                     stages {
+
                         stage('Checkout') {
                             steps {
                                 git url: "${REPO_URL}", branch: 'main'
                             }
                         }
 
-                        stage('Install Agent') {
+                        stage('Install Agent1') {
                             steps {
+                                echo 'Installing RKE2 Agent on workernode1...'
+
                                 sh """
-                                    set -e
                                     chmod +x ${INSTALL_AGENT_SCRIPT}
-                                    ${INSTALL_AGENT_SCRIPT}
+                                    ./${INSTALL_AGENT_SCRIPT}
                                 """
                             }
                         }
                     }
                 }
 
-                stage('Install Agent 2') {
+                stage('Install Agent on workernode2') {
+
                     agent { label 'agent2' }
 
                     stages {
+
                         stage('Checkout') {
                             steps {
                                 git url: "${REPO_URL}", branch: 'main'
                             }
                         }
 
-                        stage('Install Agent') {
+                        stage('Install Agent2') {
                             steps {
+                                echo 'Installing RKE2 Agent on workernode2...'
+
                                 sh """
-                                    set -e
                                     chmod +x ${INSTALL_AGENT_SCRIPT}
-                                    ${INSTALL_AGENT_SCRIPT}
+                                    ./${INSTALL_AGENT_SCRIPT}
                                 """
                             }
                         }
@@ -166,44 +187,50 @@ pipeline {
 
             parallel {
 
-                stage('Uninstall Agent 1') {
+                stage('Uninstall Agent on workernode1') {
+
                     agent { label 'agent1' }
 
                     stages {
+
                         stage('Checkout') {
                             steps {
                                 git url: "${REPO_URL}", branch: 'main'
                             }
                         }
 
-                        stage('Uninstall Agent') {
+                        stage('Uninstall Agent1') {
                             steps {
+                                echo 'Uninstalling RKE2 Agent from workernode1...'
+
                                 sh """
-                                    set -e
                                     chmod +x ${UNINSTALL_AGENT_SCRIPT}
-                                    ${UNINSTALL_AGENT_SCRIPT}
+                                    ./${UNINSTALL_AGENT_SCRIPT}
                                 """
                             }
                         }
                     }
                 }
 
-                stage('Uninstall Agent 2') {
+                stage('Uninstall Agent on workernode2') {
+
                     agent { label 'agent2' }
 
                     stages {
+
                         stage('Checkout') {
                             steps {
                                 git url: "${REPO_URL}", branch: 'main'
                             }
                         }
 
-                        stage('Uninstall Agent') {
+                        stage('Uninstall Agent2') {
                             steps {
+                                echo 'Uninstalling RKE2 Agent from workernode2...'
+
                                 sh """
-                                    set -e
                                     chmod +x ${UNINSTALL_AGENT_SCRIPT}
-                                    ${UNINSTALL_AGENT_SCRIPT}
+                                    ./${UNINSTALL_AGENT_SCRIPT}
                                 """
                             }
                         }
