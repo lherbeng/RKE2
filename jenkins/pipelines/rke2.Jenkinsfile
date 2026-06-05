@@ -9,8 +9,7 @@ pipeline {
         UNINSTALL_SERVER_SCRIPT = "${BASE_DIR}/uninstall-server.sh"
         INSTALL_AGENT_SCRIPT = "${BASE_DIR}/install-agent.sh"
         UNINSTALL_AGENT_SCRIPT = "${BASE_DIR}/uninstall-agent.sh"
-
-        KUBECONFIG = '/etc/rancher/rke2/rke2.yaml'
+        KUBECONFIG_SCRIPT = "${BASE_DIR}/kubeconfig.sh"
     }
 
     parameters {
@@ -61,12 +60,11 @@ pipeline {
                 stage('Verify Server') {
                     steps {
                         echo 'Setting up kubeconfig and verifying RKE2 cluster...'
-                            
+
                         sh """
-                            chmod +x ${BASE_DIR}/kubeconfig.sh
-                            ./${BASE_DIR}/kubeconfig.sh
-                        """        
-                        }
+                            chmod +x ${KUBECONFIG_SCRIPT}
+                            ./${KUBECONFIG_SCRIPT}
+                        """
                     }
                 }
             }
