@@ -11,7 +11,7 @@ pipeline {
         UNINSTALL_AGENT_SCRIPT = "${BASE_DIR}/uninstall-agent.sh"
         KUBECONFIG_SCRIPT = "${BASE_DIR}/kubeconfig.sh"
 
-        // ✅ FIX #1: global kubeconfig for all kubectl commands
+        // FIX: persistent kubeconfig (replaces export issue)
         KUBECONFIG = "/home/jenkins/.kube/config"
     }
 
@@ -54,22 +54,24 @@ pipeline {
                         echo 'Installing RKE2 Server...'
 
                         sh """
+                            set -e
                             chmod +x ${INSTALL_SERVER_SCRIPT}
                             bash ${INSTALL_SERVER_SCRIPT}
                         """
                     }
                 }
 
-                stage('Verify Server + Fix Kubeconfig') {
+                stage('Verify Server') {
                     steps {
-                        echo 'Fixing kubeconfig for Jenkins access...'
+                        echo 'Creating kubeconfig and verifying cluster...'
 
                         sh """
+                            set -e
                             chmod +x ${KUBECONFIG_SCRIPT}
                             bash ${KUBECONFIG_SCRIPT}
                         """
 
-                        // ✅ FIX #2: ensure kubeconfig is usable (no export needed)
+                        // FIX: kubeconfig copy so kubectl works WITHOUT export
                         sh """
                             mkdir -p /home/jenkins/.kube
                             sudo cp /etc/rancher/rke2/rke2.yaml /home/jenkins/.kube/config
@@ -77,8 +79,8 @@ pipeline {
                             chmod 600 /home/jenkins/.kube/config
                         """
 
-                        // optional verification
                         sh """
+                            set -e
                             kubectl get nodes || true
                         """
                     }
@@ -109,6 +111,7 @@ pipeline {
                         echo 'Uninstalling RKE2 Server...'
 
                         sh """
+                            set -e
                             chmod +x ${UNINSTALL_SERVER_SCRIPT}
                             bash ${UNINSTALL_SERVER_SCRIPT}
                         """
@@ -142,6 +145,7 @@ pipeline {
                                 echo 'Installing RKE2 Agent on workernode1...'
 
                                 sh """
+                                    set -e
                                     chmod +x ${INSTALL_AGENT_SCRIPT}
                                     bash ${INSTALL_AGENT_SCRIPT}
                                 """
@@ -165,6 +169,7 @@ pipeline {
                                 echo 'Installing RKE2 Agent on workernode2...'
 
                                 sh """
+                                    set -e
                                     chmod +x ${INSTALL_AGENT_SCRIPT}
                                     bash ${INSTALL_AGENT_SCRIPT}
                                 """
@@ -200,6 +205,7 @@ pipeline {
                                 echo 'Uninstalling RKE2 Agent from workernode1...'
 
                                 sh """
+                                    set -e
                                     chmod +x ${UNINSTALL_AGENT_SCRIPT}
                                     bash ${UNINSTALL_AGENT_SCRIPT}
                                 """
@@ -209,7 +215,7 @@ pipeline {
                 }
 
                 stage('Uninstall Agent on workernode2') {
-                    agent { label 'agent2' }
+                    agent { label: 'agent2' }
 
                     stages {
                         stage('Checkout') {
@@ -223,6 +229,7 @@ pipeline {
                                 echo 'Uninstalling RKE2 Agent from workernode2...'
 
                                 sh """
+                                    set -e
                                     chmod +x ${UNINSTALL_AGENT_SCRIPT}
                                     bash ${UNINSTALL_AGENT_SCRIPT}
                                 """
