@@ -59,7 +59,7 @@ pipeline {
 
                 stage('Verify Server') {
                     steps {
-                        echo 'Setting up kubeconfig and verifying RKE2 cluster...'
+                        echo 'Creating kubeconfig and verifying cluster...'
 
                         sh """
                             chmod +x ${KUBECONFIG_SCRIPT}
@@ -112,11 +112,9 @@ pipeline {
             parallel {
 
                 stage('Install Agent on workernode1') {
-
                     agent { label 'agent1' }
 
                     stages {
-
                         stage('Checkout') {
                             steps {
                                 git url: "${REPO_URL}", branch: 'main'
@@ -137,11 +135,9 @@ pipeline {
                 }
 
                 stage('Install Agent on workernode2') {
-
                     agent { label 'agent2' }
 
                     stages {
-
                         stage('Checkout') {
                             steps {
                                 git url: "${REPO_URL}", branch: 'main'
@@ -174,11 +170,9 @@ pipeline {
             parallel {
 
                 stage('Uninstall Agent on workernode1') {
-
                     agent { label 'agent1' }
 
                     stages {
-
                         stage('Checkout') {
                             steps {
                                 git url: "${REPO_URL}", branch: 'main'
@@ -199,11 +193,9 @@ pipeline {
                 }
 
                 stage('Uninstall Agent on workernode2') {
-
                     agent { label 'agent2' }
 
                     stages {
-
                         stage('Checkout') {
                             steps {
                                 git url: "${REPO_URL}", branch: 'main'

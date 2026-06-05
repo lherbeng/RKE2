@@ -1,12 +1,14 @@
 #!/bin/bash
-
 set -e
 
 echo "Waiting for RKE2..."
 sleep 30
 
-sudo cp /etc/rancher/rke2/rke2.yaml ~/kubeconfig.yaml
+KCFG="$HOME/kubeconfig.yaml"
 
-export KUBECONFIG=~/kubeconfig.yaml
+sudo cp /etc/rancher/rke2/rke2.yaml "$KCFG"
+sudo chown $(id -u):$(id -g) "$KCFG"
 
-kubectl get nodes -o wide
+echo "Using kubeconfig: $KCFG"
+
+KUBECONFIG="$KCFG" kubectl get nodes -o wide
