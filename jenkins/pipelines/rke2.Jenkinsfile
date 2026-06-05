@@ -23,7 +23,7 @@ pipeline {
         choice(
             name: 'ACTION',
             choices: ['install', 'uninstall'],
-            description: 'Choose whether to install or uninstall RKE2'
+            description: 'Choose action'
         )
     }
 
@@ -61,7 +61,7 @@ pipeline {
                     steps {
                         sh """
                             set -e
-                            echo "Verifying cluster..."
+                            echo "Checking cluster..."
 
                             KUBECONFIG=${KUBECONFIG_PATH} kubectl get nodes -o wide
                         """
@@ -110,19 +110,17 @@ pipeline {
 
             parallel {
 
-                stage('Install Agent on workernode1') {
-
+                stage('Install Agent 1') {
                     agent { label 'agent1' }
 
                     stages {
-
                         stage('Checkout') {
                             steps {
                                 git url: "${REPO_URL}", branch: 'main'
                             }
                         }
 
-                        stage('Install Agent1') {
+                        stage('Install Agent') {
                             steps {
                                 sh """
                                     set -e
@@ -134,19 +132,17 @@ pipeline {
                     }
                 }
 
-                stage('Install Agent on workernode2') {
-
+                stage('Install Agent 2') {
                     agent { label 'agent2' }
 
                     stages {
-
                         stage('Checkout') {
                             steps {
                                 git url: "${REPO_URL}", branch: 'main'
                             }
                         }
 
-                        stage('Install Agent2') {
+                        stage('Install Agent') {
                             steps {
                                 sh """
                                     set -e
@@ -170,19 +166,17 @@ pipeline {
 
             parallel {
 
-                stage('Uninstall Agent on workernode1') {
-
+                stage('Uninstall Agent 1') {
                     agent { label 'agent1' }
 
                     stages {
-
                         stage('Checkout') {
                             steps {
                                 git url: "${REPO_URL}", branch: 'main'
                             }
                         }
 
-                        stage('Uninstall Agent1') {
+                        stage('Uninstall Agent') {
                             steps {
                                 sh """
                                     set -e
@@ -194,19 +188,17 @@ pipeline {
                     }
                 }
 
-                stage('Uninstall Agent on workernode2') {
-
+                stage('Uninstall Agent 2') {
                     agent { label 'agent2' }
 
                     stages {
-
                         stage('Checkout') {
                             steps {
                                 git url: "${REPO_URL}", branch: 'main'
                             }
                         }
 
-                        stage('Uninstall Agent2') {
+                        stage('Uninstall Agent') {
                             steps {
                                 sh """
                                     set -e
