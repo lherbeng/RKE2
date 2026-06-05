@@ -9,6 +9,8 @@ pipeline {
         UNINSTALL_SERVER_SCRIPT = "${BASE_DIR}/uninstall-server.sh"
         INSTALL_AGENT_SCRIPT = "${BASE_DIR}/install-agent.sh"
         UNINSTALL_AGENT_SCRIPT = "${BASE_DIR}/uninstall-agent.sh"
+
+        KUBECONFIG = '/etc/rancher/rke2/rke2.yaml'
     }
 
     parameters {
@@ -57,26 +59,16 @@ pipeline {
                     }
                 }
 
-                stage('Verify Server (FIXED KUBECONFIG)') {
+                stage('Verify Server') {
                     steps {
                         echo 'Creating kubeconfig and verifying cluster...'
 
                         sh """
                             set -e
 
-                            # wait a bit for API server readiness (important in RKE2)
-                            sleep 10
-
-                            # create kubeconfig for Jenkins user
-                            mkdir -p /home/jenkins/.kube
-
-                            sudo cp /etc/rancher/rke2/rke2.yaml /home/jenkins/.kube/config
-                            sudo chown jenkins:jenkins /home/jenkins/.kube/config
-                            chmod 600 /home/jenkins/.kube/config
-
-                            # verify cluster using explicit kubeconfig (NO export dependency)
-                            KUBECONFIG=/home/jenkins/.kube/config kubectl get nodes -o wide || \
-                            echo "Cluster not ready or kubectl access issue"
+                            # IMPORTANT: explicit kubeconfig usage (fix x509 issue context problem)
+                            KUBECONFIG=${KUBECONFIG} kubectl get nodes -o wide || \
+                            echo "⚠ kubectl failed but RKE2 may still be running"
                         """
                     }
                 }
