@@ -10,6 +10,9 @@ pipeline {
         INSTALL_AGENT_SCRIPT = "${BASE_DIR}/install-agent.sh"
         UNINSTALL_AGENT_SCRIPT = "${BASE_DIR}/uninstall-agent.sh"
         KUBECONFIG_SCRIPT = "${BASE_DIR}/kubeconfig.sh"
+
+        // ✅ FIX #1: global kubeconfig for all kubectl commands
+        KUBECONFIG = "/home/jenkins/.kube/config"
     }
 
     parameters {
@@ -52,18 +55,31 @@ pipeline {
 
                         sh """
                             chmod +x ${INSTALL_SERVER_SCRIPT}
-                            ./${INSTALL_SERVER_SCRIPT}
+                            bash ${INSTALL_SERVER_SCRIPT}
                         """
                     }
                 }
 
-                stage('Verify Server') {
+                stage('Verify Server + Fix Kubeconfig') {
                     steps {
-                        echo 'Creating kubeconfig and verifying cluster...'
+                        echo 'Fixing kubeconfig for Jenkins access...'
 
                         sh """
                             chmod +x ${KUBECONFIG_SCRIPT}
-                            ./${KUBECONFIG_SCRIPT}
+                            bash ${KUBECONFIG_SCRIPT}
+                        """
+
+                        // ✅ FIX #2: ensure kubeconfig is usable (no export needed)
+                        sh """
+                            mkdir -p /home/jenkins/.kube
+                            sudo cp /etc/rancher/rke2/rke2.yaml /home/jenkins/.kube/config
+                            sudo chown jenkins:jenkins /home/jenkins/.kube/config
+                            chmod 600 /home/jenkins/.kube/config
+                        """
+
+                        // optional verification
+                        sh """
+                            kubectl get nodes || true
                         """
                     }
                 }
@@ -94,7 +110,7 @@ pipeline {
 
                         sh """
                             chmod +x ${UNINSTALL_SERVER_SCRIPT}
-                            ./${UNINSTALL_SERVER_SCRIPT}
+                            bash ${UNINSTALL_SERVER_SCRIPT}
                         """
                     }
                 }
@@ -127,7 +143,7 @@ pipeline {
 
                                 sh """
                                     chmod +x ${INSTALL_AGENT_SCRIPT}
-                                    ./${INSTALL_AGENT_SCRIPT}
+                                    bash ${INSTALL_AGENT_SCRIPT}
                                 """
                             }
                         }
@@ -150,7 +166,7 @@ pipeline {
 
                                 sh """
                                     chmod +x ${INSTALL_AGENT_SCRIPT}
-                                    ./${INSTALL_AGENT_SCRIPT}
+                                    bash ${INSTALL_AGENT_SCRIPT}
                                 """
                             }
                         }
@@ -185,7 +201,7 @@ pipeline {
 
                                 sh """
                                     chmod +x ${UNINSTALL_AGENT_SCRIPT}
-                                    ./${UNINSTALL_AGENT_SCRIPT}
+                                    bash ${UNINSTALL_AGENT_SCRIPT}
                                 """
                             }
                         }
@@ -208,7 +224,7 @@ pipeline {
 
                                 sh """
                                     chmod +x ${UNINSTALL_AGENT_SCRIPT}
-                                    ./${UNINSTALL_AGENT_SCRIPT}
+                                    bash ${UNINSTALL_AGENT_SCRIPT}
                                 """
                             }
                         }
