@@ -11,8 +11,7 @@ pipeline {
         UNINSTALL_AGENT_SCRIPT = "${BASE_DIR}/uninstall-agent.sh"
         KUBECONFIG_SCRIPT = "${BASE_DIR}/kubeconfig.sh"
 
-        // FIX: persistent kubeconfig (replaces export issue)
-        KUBECONFIG = "/home/jenkins/.kube/config"
+        KUBECONFIG = '/etc/rancher/rke2/rke2.yaml'
     }
 
     parameters {
@@ -54,9 +53,8 @@ pipeline {
                         echo 'Installing RKE2 Server...'
 
                         sh """
-                            set -e
                             chmod +x ${INSTALL_SERVER_SCRIPT}
-                            bash ${INSTALL_SERVER_SCRIPT}
+                            ./${INSTALL_SERVER_SCRIPT}
                         """
                     }
                 }
@@ -66,12 +64,11 @@ pipeline {
                         echo 'Creating kubeconfig and verifying cluster...'
 
                         sh """
-                            set -e
                             chmod +x ${KUBECONFIG_SCRIPT}
-                            bash ${KUBECONFIG_SCRIPT}
+                            ./${KUBECONFIG_SCRIPT}
                         """
 
-                        // FIX: kubeconfig copy so kubectl works WITHOUT export
+                        // ✅ FIX ONLY: copy kubeconfig to Jenkins-safe location
                         sh """
                             mkdir -p /home/jenkins/.kube
                             sudo cp /etc/rancher/rke2/rke2.yaml /home/jenkins/.kube/config
@@ -79,9 +76,10 @@ pipeline {
                             chmod 600 /home/jenkins/.kube/config
                         """
 
+                        // ✅ FIXED kubectl execution (NO export dependency)
                         sh """
-                            set -e
-                            kubectl get nodes || true
+                            export KUBECONFIG=/home/jenkins/.kube/config
+                            kubectl get nodes -o wide
                         """
                     }
                 }
@@ -111,9 +109,8 @@ pipeline {
                         echo 'Uninstalling RKE2 Server...'
 
                         sh """
-                            set -e
                             chmod +x ${UNINSTALL_SERVER_SCRIPT}
-                            bash ${UNINSTALL_SERVER_SCRIPT}
+                            ./${UNINSTALL_SERVER_SCRIPT}
                         """
                     }
                 }
@@ -131,9 +128,11 @@ pipeline {
             parallel {
 
                 stage('Install Agent on workernode1') {
+
                     agent { label 'agent1' }
 
                     stages {
+
                         stage('Checkout') {
                             steps {
                                 git url: "${REPO_URL}", branch: 'main'
@@ -145,9 +144,8 @@ pipeline {
                                 echo 'Installing RKE2 Agent on workernode1...'
 
                                 sh """
-                                    set -e
                                     chmod +x ${INSTALL_AGENT_SCRIPT}
-                                    bash ${INSTALL_AGENT_SCRIPT}
+                                    ./${INSTALL_AGENT_SCRIPT}
                                 """
                             }
                         }
@@ -155,9 +153,11 @@ pipeline {
                 }
 
                 stage('Install Agent on workernode2') {
+
                     agent { label 'agent2' }
 
                     stages {
+
                         stage('Checkout') {
                             steps {
                                 git url: "${REPO_URL}", branch: 'main'
@@ -169,9 +169,8 @@ pipeline {
                                 echo 'Installing RKE2 Agent on workernode2...'
 
                                 sh """
-                                    set -e
                                     chmod +x ${INSTALL_AGENT_SCRIPT}
-                                    bash ${INSTALL_AGENT_SCRIPT}
+                                    ./${INSTALL_AGENT_SCRIPT}
                                 """
                             }
                         }
@@ -191,9 +190,11 @@ pipeline {
             parallel {
 
                 stage('Uninstall Agent on workernode1') {
+
                     agent { label 'agent1' }
 
                     stages {
+
                         stage('Checkout') {
                             steps {
                                 git url: "${REPO_URL}", branch: 'main'
@@ -205,9 +206,8 @@ pipeline {
                                 echo 'Uninstalling RKE2 Agent from workernode1...'
 
                                 sh """
-                                    set -e
                                     chmod +x ${UNINSTALL_AGENT_SCRIPT}
-                                    bash ${UNINSTALL_AGENT_SCRIPT}
+                                    ./${UNINSTALL_AGENT_SCRIPT}
                                 """
                             }
                         }
@@ -215,9 +215,11 @@ pipeline {
                 }
 
                 stage('Uninstall Agent on workernode2') {
-                    agent { label: 'agent2' }
+
+                    agent { label 'agent2' }
 
                     stages {
+
                         stage('Checkout') {
                             steps {
                                 git url: "${REPO_URL}", branch: 'main'
@@ -229,9 +231,8 @@ pipeline {
                                 echo 'Uninstalling RKE2 Agent from workernode2...'
 
                                 sh """
-                                    set -e
                                     chmod +x ${UNINSTALL_AGENT_SCRIPT}
-                                    bash ${UNINSTALL_AGENT_SCRIPT}
+                                    ./${UNINSTALL_AGENT_SCRIPT}
                                 """
                             }
                         }
