@@ -6,6 +6,7 @@ Verifies that all nodes are registered in the cluster and shows their status (Re
 
 <img width="1138" height="52" alt="image" src="https://github.com/user-attachments/assets/583d8aff-d78e-4c8b-8e97-87649434f071" />
 
+
 Ensures all core Kubernetes and RKE2 components (CNI, scheduler, controller-manager, etc.) are running properly.
 
 `kubectl get pods -n kube-system`
