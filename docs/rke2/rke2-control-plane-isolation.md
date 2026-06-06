@@ -1,1 +1,1 @@
-## This document is about configuring control-plane isolation in an RKE2 cluster using taints and tolerations to prevent application workloads from being scheduled on the control-plane node.
+## This document describes how control-plane isolation is configured in an RKE2 cluster to ensure application workloads are scheduled only on worker nodes, as a Kubernetes best practice.
