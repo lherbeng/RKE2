@@ -1,6 +1,6 @@
 ## This document validates that the RKE2 cluster is fully operational after installation or changes. It confirms that the control plane, worker nodes, and system components are healthy and ready for workloads.
 
-Verifies that all nodes are registered in the cluster and shows their status (Ready/NotReady), roles, and versions.
+### Verifies that all nodes are registered in the cluster and shows their status (Ready/NotReady), roles, and versions.
 
 `kubectl get nodes -o wide`
 
