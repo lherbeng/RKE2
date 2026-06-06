@@ -57,7 +57,25 @@ Verify workload distribution across worker nodes
 ### Scale Down Deployment
 
 `kubectl scale deployment nginx --replicas=1`
+<br>
 `kubectl get deployments`
+<br>
 `kubectl get pods`
 
 <img width="441" height="151" alt="image" src="https://github.com/user-attachments/assets/0e17589c-4612-40d8-bb93-d09d00b46221" />
+
+### Delete Deployment
+
+`kubectl delete deployment nginx` 
+<br>
+`kubectl get deployment`
+<br>
+`kubectl get pods`
+
+<img width="391" height="120" alt="image" src="https://github.com/user-attachments/assets/488f3a58-b99b-4cc0-b732-9a7d9b6c6f4d" />
+
+
+
+
+
+
