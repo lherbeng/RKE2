@@ -16,4 +16,11 @@
 
 <br>
 
-### 
+### Check Running Pods in detailed view:
+
+`kubectl get pods -o wide` 
+
+<img width="849" height="52" alt="image" src="https://github.com/user-attachments/assets/a0075f7a-e1a3-408b-9b2d-ca72785febd1" />
+
+
+
