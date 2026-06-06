@@ -62,6 +62,25 @@
 
 <img width="547" height="81" alt="image" src="https://github.com/user-attachments/assets/c409d7e8-e906-49ad-8960-f0bfc3618260" />
 
+<br>
+
+<br>
+
+### Use the following commands to verify that the Kubernetes cluster API server is correctly configured and accessible via a real network IP address, not localhost.
+
+`cat ~/.kube/config`
+
+<img width="1147" height="355" alt="image" src="https://github.com/user-attachments/assets/80215b48-e582-413a-9559-a4574001e56f" />
+
+`cat /etc/rancher/rke2/rke2.yaml`
+
+<img width="1135" height="220" alt="image" src="https://github.com/user-attachments/assets/4349a083-5b4c-4953-8503-b7262feb8cf5" />
+
+`kubectl config view`
+
+<img width="385" height="336" alt="image" src="https://github.com/user-attachments/assets/56f90b0c-689b-498c-86d1-05395c8a9ce8" />
+
+
 
 
 
