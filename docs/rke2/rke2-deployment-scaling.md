@@ -22,10 +22,36 @@
 
 <img width="849" height="52" alt="image" src="https://github.com/user-attachments/assets/a0075f7a-e1a3-408b-9b2d-ca72785febd1" />
 
-Purpose: 
-Verify pod creation
-Verify pod status
-Verify node placement
+<br>
+
+<br>
+
+### Scale Up Deployment
+
+`kubectl scale deployment nginx --replicas=3`
+
+<img width="439" height="58" alt="image" src="https://github.com/user-attachments/assets/0e5dc6d6-9d9f-482b-8568-3d098fc4075c" />
+
+### Verify
+
+`kubectl get deployments`
+
+<img width="336" height="70" alt="image" src="https://github.com/user-attachments/assets/f1b0c03a-a9a8-45f2-a02d-849726a3fe42" />
+
+<br>
+
+<br>
+
+### Verify Pod Distribution
+
+`kubectl get pods -o wide`
+
+<img width="862" height="84" alt="image" src="https://github.com/user-attachments/assets/eb959cc0-18c6-491d-8b1f-a4a3db5ead2a" />
+
+### Purpose:
+
+Verify Kubernetes Scheduler
+Verify workload distribution across worker nodes
 
 
 
