@@ -22,5 +22,10 @@
 
 <img width="849" height="52" alt="image" src="https://github.com/user-attachments/assets/a0075f7a-e1a3-408b-9b2d-ca72785febd1" />
 
+Purpose: 
+Verify pod creation
+Verify pod status
+Verify node placement
+
 
 
