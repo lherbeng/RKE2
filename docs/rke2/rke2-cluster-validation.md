@@ -10,6 +10,8 @@ Verifies that all nodes are registered in the cluster and shows their status (Re
 
 <br>
 
+<br>
+
 Ensures all core Kubernetes and RKE2 components (CNI, scheduler, controller-manager, etc.) are running properly.
 
 `kubectl get pods -n kube-system`
