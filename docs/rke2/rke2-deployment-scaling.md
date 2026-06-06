@@ -54,5 +54,10 @@ Verify Kubernetes Scheduler
 <br>
 Verify workload distribution across worker nodes
 
+### Scale Down Deployment
 
+`kubectl scale deployment nginx --replicas=1`
+`kubectl get deployments`
+`kubectl get pods`
 
+<img width="441" height="151" alt="image" src="https://github.com/user-attachments/assets/0e17589c-4612-40d8-bb93-d09d00b46221" />
