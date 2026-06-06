@@ -2,4 +2,4 @@ This document validates that the RKE2 cluster is fully operational after install
 
 `kubectl get nodes -o wide`
 
-![alt text](image-2.png)
+<img width="1138" height="52" alt="image" src="https://github.com/user-attachments/assets/583d8aff-d78e-4c8b-8e97-87649434f071" />
