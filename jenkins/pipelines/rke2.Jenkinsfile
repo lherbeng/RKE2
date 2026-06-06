@@ -1,6 +1,12 @@
 pipeline {
     agent none
 
+        options { 
+            timestamps() 
+            disableConcurrentBuilds() 
+            skipDefaultCheckout(true) 
+            buildDiscarder(logRotator(numToKeepStr: '20')) }
+
     environment {
         REPO_URL = 'https://github.com/lherbeng/RKE2.git'
         BASE_DIR = 'infra/rke2'
@@ -9,9 +15,7 @@ pipeline {
         UNINSTALL_SERVER_SCRIPT = "${BASE_DIR}/uninstall-server.sh"
         INSTALL_AGENT_SCRIPT = "${BASE_DIR}/install-agent.sh"
         UNINSTALL_AGENT_SCRIPT = "${BASE_DIR}/uninstall-agent.sh"
-
         KUBECONFIG_SCRIPT = "${BASE_DIR}/kubeconfig.sh"
-
         KUBECONFIG = '/etc/rancher/rke2/rke2.yaml'
     }
 
