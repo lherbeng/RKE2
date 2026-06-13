@@ -22,7 +22,7 @@ pipeline {
     parameters {
         choice(
             name: 'NODE_TYPE',
-            choices: ['server', 'agent'],
+            choices: ['server', 'agent']
             description: 'Select node type to manage'
         )
 
