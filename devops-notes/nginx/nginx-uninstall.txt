@@ -1,0 +1,45 @@
+
+# Check if the NGINX service exists and its status.
+systemctl status nginx 
+× nginx.service
+     Loaded: not-found (Reason: Unit nginx.service not found.)
+     Active: failed (Result: exit-code) since Sun 2026-06-14 02:51:35 UTC; 2h 15min ago
+        CPU: 6ms
+
+# Check whether any NGINX packages are installed.
+dpkg -l | grep nginx
+
+# Check if the NGINX configuration directory exists.
+ls -ld /etc/nginx
+
+# Check if the NGINX is actually installed
+which nginx
+
+# clear the failed state of nginx
+systemctl reset-failed nginx
+
+# Check the status
+systemctl status nginx
+Unit nginx.service could not be found.
+
+# NGINX configuration directory
+sudo rm -rf /etc/nginx
+
+# NGINX repository definition
+sudo rm -f /etc/apt/sources.list.d/nginx.list
+
+# Repository pinning configuration
+sudo rm -f /etc/apt/preferences.d/99nginx
+
+# NGINX signing key
+sudo rm -f /usr/share/keyrings/nginx-archive-keyring.gpg
+
+# Check for leftover NGINX processes
+ps aux | grep nginx
+
+# The Jenkins workspace for your loadbalancer-deploy job.
+rm -rf /home/jenkins/workspace/loadbalancer-deploy
+rm -rf /home/jenkins/workspace/loadbalancer-deploy@tmp
+
+# Locate the nginx.conf file
+find / -name "*nginx.conf" 2>/dev/null

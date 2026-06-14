@@ -36,6 +36,9 @@ rm -f /etc/apt/sources.list.d/nginx.list
 echo "Removing NGINX signing key..."
 rm -f /usr/share/keyrings/nginx-archive-keyring.gpg
 
+# Remove pinning configuration
+rm -f /etc/apt/preferences.d/99nginx
+
 # Update package list
 echo "Updating package list..."
 apt update
