@@ -1,6 +1,7 @@
 #!/bin/bash
 
-set -e  # Exit immediately if a command exits with a non-zero status
+# Exit immediately if a command exits with a non-zero status
+set -e 
 
 # Define variables
 KEYRING_PATH="/usr/share/keyrings/nginx-archive-keyring.gpg"

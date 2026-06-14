@@ -21,24 +21,25 @@ pipeline {
         booleanParam(
             name: 'ENABLE_SSL',
             defaultValue: false,
-            description: 'Check to enable SSL installation (basic)'
+            description: 'Enable basic SSL installation'
         )
         booleanParam(
             name: 'ENABLE_SSL_WITH_LOGS',
             defaultValue: false,
-            description: 'Check to enable SSL installation with logs'
+            description: 'Enable SSL installation with logs (recommended for debugging)'
         )
     }
 
     stages {
+
         stage('Checkout') {
             steps {
-                echo 'Checking out code from GitHub...'
+                echo 'Checking out repository...'
                 git url: "${REPO_URL}", branch: 'main'
             }
         }
 
-        stage('Install nginx service') {
+        stage('Install NGINX') {
             when {
                 expression { params.ACTION == 'install' }
             }
@@ -46,54 +47,53 @@ pipeline {
                 echo 'Installing NGINX...'
 
                 sh "chmod +x ${INSTALL_SCRIPT_PATH}"
-                sh "./${INSTALL_SCRIPT_PATH}"
+                sh "${INSTALL_SCRIPT_PATH}"
 
-                // Backup and copy nginx.conf
                 sh """
                     if [ -f /etc/nginx/nginx.conf ]; then
                         sudo mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.orig
                     fi
                     sudo cp ${NGINX_CONFIG} /etc/nginx/nginx.conf
                 """
+            }
+        }
 
+        stage('SSL Setup') {
+            when {
+                expression { params.ACTION == 'install' && (params.ENABLE_SSL || params.ENABLE_SSL_WITH_LOGS) }
+            }
+            steps {
                 script {
-                    if (params.ENABLE_SSL || params.ENABLE_SSL_WITH_LOGS) {
-                        def selectedScript = params.ENABLE_SSL_WITH_LOGS ? SSL_LOG_SCRIPT_PATH : SSL_SCRIPT_PATH
+                    def selectedScript = params.ENABLE_SSL_WITH_LOGS
+                        ? SSL_LOG_SCRIPT_PATH
+                        : SSL_SCRIPT_PATH
 
-                        echo "Running SSL script: ${selectedScript}"
+                    echo "Running SSL script: ${selectedScript}"
 
-                        sh """
-                            sudo mkdir -p /etc/nginx/ssl
-                            sudo chmod +x ${selectedScript}
-                            sudo -E ./${selectedScript}
-                        """/
+                    sh """
+                        sudo mkdir -p /etc/nginx/ssl
+                        chmod +x ${selectedScript}
+                        sudo bash ${selectedScript}
+                    """
 
-                        // Add deep SSL validation & debug output
-                        sh """
-                            echo 'Jenkins workspace:'
-                            pwd
-                            echo 'Listing workspace contents...'
-                            ls -l
+                    sh """
+                        echo "Validating SSL files..."
+                        ls -lah /etc/nginx/ssl || true
 
-                            echo 'Listing /etc/nginx/ssl contents...'
-                            sudo ls -l /etc/nginx/ssl || echo '/etc/nginx/ssl not found'
-
-                            echo 'Preview SSL certificate content:'
-                            sudo head -n 5 /etc/nginx/ssl/lgesite.com.crt || echo 'CRT file missing or unreadable'
-
-                            echo 'Preview SSL key content:'
-                            sudo head -n 5 /etc/nginx/ssl/lgesite.com.key || echo 'KEY file missing or unreadable'
-
-                            echo 'Verifying file existence...'
-                            if [ ! -f /etc/nginx/ssl/lgesite.com.crt ] || [ ! -f /etc/nginx/ssl/lgesite.com.key ]; then
-                                echo 'ERROR: Missing SSL cert or key file!' >&2
-                                exit 1
-                            fi
-                        """
-                    }
+                        if [ ! -f /etc/nginx/ssl/lgesite.com.crt ] || [ ! -f /etc/nginx/ssl/lgesite.com.key ]; then
+                            echo "ERROR: SSL cert or key missing!" >&2
+                            exit 1
+                        fi
+                    """
                 }
+            }
+        }
 
-                echo "Testing and restarting NGINX after SSL is in place..."
+        stage('Restart NGINX') {
+            when {
+                expression { params.ACTION == 'install' }
+            }
+            steps {
                 sh """
                     sudo nginx -t
                     sudo systemctl restart nginx
@@ -101,28 +101,27 @@ pipeline {
             }
         }
 
-        stage('Uninstall nginx service') {
+        stage('Uninstall NGINX') {
             when {
                 expression { params.ACTION == 'uninstall' }
             }
             steps {
                 echo 'Uninstalling NGINX...'
                 sh "chmod +x ${UNINSTALL_SCRIPT_PATH}"
-                sh "./${UNINSTALL_SCRIPT_PATH}"
+                sh "${UNINSTALL_SCRIPT_PATH}"
             }
         }
     }
 
     post {
         success {
-            script {
-                echo "NGINX service ${params.ACTION} completed successfully!"
-            }
+            echo "Pipeline SUCCESS: ${params.ACTION} completed"
         }
         failure {
-            script {
-                echo "NGINX service ${params.ACTION} failed!"
-            }
+            echo "Pipeline FAILED: ${params.ACTION} encountered an error"
+        }
+        always {
+            cleanWs()
         }
     }
 }
