@@ -1,0 +1,126 @@
+
+# Generate a Deployment YAML file without creating the resource in the cluster.
+
+kubectl create deployment nginx-deploy --image=nginx:latest --port=80 --dry-run=client -o yaml > nginx-deploy.yaml
+
+# You can remove the status field because it is managed automatically by the Kubernetes cluster. 
+# The strategy and resources fields may be useful in the future, so you can either keep or remove them 
+# depending on your needs. If you are not currently using them, removing them is fine. Keeping them is 
+# also acceptable if you plan to configure deployment strategies or resource limits later. 
+# These fields are optional.
+
+root@masternode:~/manifest/ingress# cat nginx-deploy.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: nginx-deploy
+  name: nginx-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-deploy
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: nginx-deploy
+    spec:
+      containers:
+      - image: nginx:latest
+        name: nginx
+        ports:
+        - containerPort: 80
+        resources: {}
+status: {}
+
+# The error means that the Deployment already exists
+
+root@masternode:~/manifest/ingress# kubectl apply -f nginx-deploy.yaml 
+The Deployment "nginx-deploy" is invalid: spec.selector: Invalid value: {"matchLabels":{"app":"nginx-deploy"}}: field is immutable
+
+
+root@masternode:~/manifest/ingress# kubectl get deployment
+NAME           READY   UP-TO-DATE   AVAILABLE   AGE
+nginx-deploy   1/1     1            1           7d6h
+root@masternode:~/manifest/ingress# kubectl delete deployment nginx-deploy
+deployment.apps "nginx-deploy" deleted from default namespace
+
+# Deploy the manifest 
+root@masternode:~/manifest/ingress# kubectl apply -f nginx-deploy.yaml 
+deployment.apps/nginx-deploy created
+
+# It shows in the kubectl describe deployment nginx-deploy output that the desired number of replicas is 3; 
+# however, the number of available Pods is 0.
+
+root@masternode:~/manifest/ingress# kubectl get deployment
+NAME           READY   UP-TO-DATE   AVAILABLE   AGE
+nginx-deploy   0/3     0            0           6m35s
+root@masternode:~/manifest/ingress# kubectl describe deployment nginx-deploy
+Name:                   nginx-deploy
+Namespace:              default
+CreationTimestamp:      Sun, 14 Jun 2026 13:05:16 +0000
+Labels:                 app=nginx-deploy
+Annotations:            deployment.kubernetes.io/revision: 1
+Selector:               app=nginx-deploy
+Replicas:               3 desired | 0 updated | 0 total | 0 available | 3 unavailable
+StrategyType:           RollingUpdate
+MinReadySeconds:        0
+RollingUpdateStrategy:  25% max unavailable, 25% max surge
+Pod Template:
+  Labels:  app=nginx-deploy
+  Containers:
+   nginx:
+    Image:         nginx:latest
+    Port:          80/TCP
+    Host Port:     0/TCP
+    Environment:   <none>
+    Mounts:        <none>
+  Volumes:         <none>
+  Node-Selectors:  <none>
+  Tolerations:     <none>
+Conditions:
+  Type             Status  Reason
+  ----             ------  ------
+  Progressing      True    NewReplicaSetCreated
+  Available        False   MinimumReplicasUnavailable
+  ReplicaFailure   True    FailedCreate
+OldReplicaSets:    <none>
+NewReplicaSet:     nginx-deploy-6644c64ff (0/3 replicas created)
+Events:
+  Type    Reason             Age    From                   Message
+  ----    ------             ----   ----                   -------
+  Normal  ScalingReplicaSet  6m48s  deployment-controller  Scaled up replica set nginx-deploy-6644c64ff from 0 to 3
+  
+# `kubectl get events` revealed the root cause of the issue. The namespace has a ResourceQuota (`cpu-quota`) that requires
+# containers to specify `requests.cpu`. Since the nginx container does not define a CPU request, Pod creation was denied.
+ 
+root@masternode:~/manifest/ingress# kubectl get po
+No resources found in default namespace.
+root@masternode:~/manifest/ingress# kubectl get events
+LAST SEEN   TYPE      REASON              OBJECT                              MESSAGE
+9m48s       Warning   FailedCreate        replicaset/nginx-deploy-6644c64ff   Error creating: pods "nginx-deploy-6644c64ff-wxxj8" is forbidden: failed quota: cpu-quota: must specify requests.cpu for: nginx
+9m48s       Warning   FailedCreate        replicaset/nginx-deploy-6644c64ff   Error creating: pods "nginx-deploy-6644c64ff-fnf54" is forbidden: failed quota: cpu-quota: must specify requests.cpu for: nginx
+9m48s       Warning   FailedCreate        replicaset/nginx-deploy-6644c64ff   Error creating: pods "nginx-deploy-6644c64ff-gwld9" is forbidden: failed quota: cpu-quota: must specify requests.cpu for: nginx
+9m48s       Warning   FailedCreate        replicaset/nginx-deploy-6644c64ff   Error creating: pods "nginx-deploy-6644c64ff-7mzv8" is forbidden: failed quota: cpu-quota: must specify requests.cpu for: nginx
+9m47s       Warning   FailedCreate        replicaset/nginx-deploy-6644c64ff   Error creating: pods "nginx-deploy-6644c64ff-n8c88" is forbidden: failed quota: cpu-quota: must specify requests.cpu for: nginx
+9m47s       Warning   FailedCreate        replicaset/nginx-deploy-6644c64ff   Error creating: pods "nginx-deploy-6644c64ff-xhnbx" is forbidden: failed quota: cpu-quota: must specify requests.cpu for: nginx
+9m47s       Warning   FailedCreate        replicaset/nginx-deploy-6644c64ff   Error creating: pods "nginx-deploy-6644c64ff-8xbc7" is forbidden: failed quota: cpu-quota: must specify requests.cpu for: nginx
+9m47s       Warning   FailedCreate        replicaset/nginx-deploy-6644c64ff   Error creating: pods "nginx-deploy-6644c64ff-mklff" is forbidden: failed quota: cpu-quota: must specify requests.cpu for: nginx
+9m46s       Warning   FailedCreate        replicaset/nginx-deploy-6644c64ff   Error creating: pods "nginx-deploy-6644c64ff-t7vm5" is forbidden: failed quota: cpu-quota: must specify requests.cpu for: nginx
+4m20s       Warning   FailedCreate        replicaset/nginx-deploy-6644c64ff   (combined from similar events): Error creating: pods "nginx-deploy-6644c64ff-zd6dh" is forbidden: failed quota: cpu-quota: must specify requests.cpu for: nginx
+10m         Normal    Killing             pod/nginx-deploy-6f8d458d9c-fnpgr   Stopping container nginx-container
+9m48s       Normal    ScalingReplicaSet   deployment/nginx-deploy             Scaled up replica set nginx-deploy-6644c64ff from 0 to 3
+
+# Check the resource quota
+
+root@masternode:~/manifest/ingress# kubectl get quota
+NAME        REQUEST                LIMIT   AGE
+cpu-quota   requests.cpu: 0/500m           7d8h
+root@masternode:~/manifest/ingress# kubectl describe quota cpu-quota
+Name:         cpu-quota
+Namespace:    default
+Resource      Used  Hard
+--------      ----  ----
+requests.cpu  0     500m
