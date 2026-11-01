@@ -9,7 +9,7 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 # Variables
-RKE2_VERSION="v1.36.5+rke2r1"
+RKE2_VERSION="v1.35.5+rke2r1"
 RKE2_CONFIG="/etc/rancher/rke2/rke2.yaml"
 KUBECONFIG_FILE="/root/.kube/config"
 KUBECTL_BIN="/var/lib/rancher/rke2/bin/kubectl"
