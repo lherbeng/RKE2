@@ -124,3 +124,6 @@ Namespace:    default
 Resource      Used  Hard
 --------      ----  ----
 requests.cpu  0     500m
+
+Note: If you have a ResourceQuota applied to a namespace, such as cpu-quota, Kubernetes will not accept the deployment 
+if you do not specify the required CPU limits and requests in your deployment manifest.

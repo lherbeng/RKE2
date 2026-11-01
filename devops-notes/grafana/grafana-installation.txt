@@ -1,0 +1,36 @@
+
+##
+
+helm repo list
+NAME                    URL                                              
+ingress-nginx           https://kubernetes.github.io/ingress-nginx       
+rancher-latest          https://releases.rancher.com/server-charts/latest
+grafana-community       https://grafana-community.github.io/helm-charts 
+
+## 
+
+helm status my-grafana -n monitoring
+
+## Show all Helm releases installed in the monitoring namespace.
+
+helm list -n monitoring
+NAME            NAMESPACE       REVISION        UPDATED                                 STATUS          CHART           APP VERSION
+my-grafana      monitoring      1               2026-06-20 13:01:44.167644879 +0000 UTC deployed        grafana-12.4.8  13.0.2  
+
+## Check everything in namespace
+
+kubectl get all -n monitoring
+
+
+## Check specific resource types:
+
+kubectl get pods -n monitoring
+kubectl get svc -n monitoring
+kubectl get deploy -n monitoring
+kubectl get sts -n monitoring
+kubectl get ingress -n monitoring
+kubectl get ns
+
+kubectl get secrets -n monitoring
+kubectl get configmap -n monitoring
+

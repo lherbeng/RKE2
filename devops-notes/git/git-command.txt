@@ -1,0 +1,6 @@
+
+# refactor → indicates you're restructuring existing files without changing functionality.
+# reorganize Kubernetes manifests → explains what was changed.
+# by resource type → explains the new organization approach (deployments, services, ingress).
+
+git commit -m "refactor: reorganize Kubernetes manifests by resource type" 
