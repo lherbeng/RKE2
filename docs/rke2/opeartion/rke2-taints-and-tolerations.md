@@ -38,9 +38,33 @@
 
 <img width="268" height="328" alt="image" src="https://github.com/user-attachments/assets/0327fec3-a026-41f2-b603-e6f613ff0809" />
 
-## Or ##
+### Or ###
 
-`kubectl create deploy nginx-deployment --image=nginx:latest --replicas=3 --dry-run=true -o yaml > nginx-deployment.yaml`
+`kubectl create deploy nginx-deployment --image=nginx:latest --replicas=3 --dry-run=client -o yaml > nginx-deployment.yaml`
+
+<img width="1141" height="441" alt="image" src="https://github.com/user-attachments/assets/f6e90d85-30c0-4960-8a86-c271ae5035f6" />
+
+### Create the Deployment ###
+
+`kubectl apply -f nginx-deployment.yaml`
+
+<img width="586" height="64" alt="image" src="https://github.com/user-attachments/assets/87ca32d3-b374-44e8-b840-721aa42a8753" />
+
+### Verify the pod placement ###
+
+`kubectl get pods -o wide`
+
+<img width="921" height="105" alt="image" src="https://github.com/user-attachments/assets/55a61862-d559-4d30-8895-249ee3e0d2d1" />
+
+### Generate a Deployment YAML ###
+
+`kubectl create deployment nginx-toleration --image=nginx:latest --replicas=3 --dry-run=client -o yaml > nginx.toleration.yaml`
+
+<img width="387" height="409" alt="image" src="https://github.com/user-attachments/assets/caecde4e-ad01-40c8-8280-23885b7f2fa8" />
+
+
+
+
 
 
 
