@@ -60,7 +60,18 @@
 
 `kubectl create deployment nginx-toleration --image=nginx:latest --replicas=3 --dry-run=client -o yaml > nginx.toleration.yaml`
 
+`kubectl apply -f nginx-toleration.yaml`
+
+`kubectl get pods -o wide`
+
 <img width="387" height="409" alt="image" src="https://github.com/user-attachments/assets/caecde4e-ad01-40c8-8280-23885b7f2fa8" />
+
+<img width="934" height="189" alt="image" src="https://github.com/user-attachments/assets/e7fe1c73-9d71-4305-ae81-3c7fbf73b5d2" />
+
+### Important: Toleration only permits scheduling on masternode; it does not force the scheduler to place pods there. ###
+
+<img width="1140" height="48" alt="image" src="https://github.com/user-attachments/assets/db12fa40-5106-4ccc-bc34-b27aabdd1f74" />
+
 
 
 
