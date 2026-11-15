@@ -14,6 +14,12 @@
 
 <img width="1150" height="67" alt="image" src="https://github.com/user-attachments/assets/0c3be20d-a6e8-4234-b391-5405cdafb342" />
 
+#### This command confirms which node has the control-plane label. ####
+
+### Expected Result: ###
+
+#### The masternode should have the NoSchedule taint, while the worker nodes should remain without this taint. ####
+
 
 
 
