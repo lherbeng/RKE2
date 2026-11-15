@@ -2,4 +2,5 @@
 
 `kubectl get nodes -o custom-columns=NAME:.metadata.name,TAINTS:.spec.taints`
 
-<img width="762" height="326" alt="image" src="https://github.com/user-attachments/assets/72baeed5-f740-49d2-a96e-18bebe79b58e" />
+<img width="664" height="99" alt="image" src="https://github.com/user-attachments/assets/a5d8d683-40f5-46b3-9ac0-77fca6a78fb8" />
+
