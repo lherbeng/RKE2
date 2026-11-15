@@ -16,7 +16,7 @@
 
 #### This command confirms which node has the control-plane label. ####
 
-### <span style="color: red;">Expected Result:</span> ### 
+<span style="color: red;">Expected Result:</span>
 
 #### The masternode should have the NoSchedule taint, while the worker nodes should remain without this taint. ####
 
