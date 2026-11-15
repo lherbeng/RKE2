@@ -36,25 +36,14 @@
 
 `vi nginx-deployment.yaml`
 
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nginx-deployment
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: nginx
-  template:
-    metadata:
-      labels:
-        app: nginx
-    spec:
-      containers:
-        - name: nginx
-          image: nginx:latest
-          ports:
-            - containerPort: 80
+<img width="268" height="328" alt="image" src="https://github.com/user-attachments/assets/0327fec3-a026-41f2-b603-e6f613ff0809" />
+
+## Or ##
+
+`kubectl create deploy nginx-deployment --image=nginx:latest --replicas=3 --dry-run=true -o yaml > nginx-deployment.yaml`
+
+
+
 
 
 
