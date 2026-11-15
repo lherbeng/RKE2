@@ -16,9 +16,49 @@
 
 #### This command confirms which node has the control-plane label. ####
 
-<span style="color: red;">Expected Result:</span>
+### Expected Result: ###
 
 #### The masternode should have the NoSchedule taint, while the worker nodes should remain without this taint. ####
+
+### Apply Control-Plane Taint ### 
+
+`kubectl taint nodes masternode node-role.kubernetes.io/control-plane=:NoSchedule`
+
+<img width="703" height="52" alt="image" src="https://github.com/user-attachments/assets/e5fc215d-67b9-479c-b1fd-fdfc0fb5474b" />
+
+### Verify the Taint ### 
+
+`kubectl get nodes -o custom-columns=NAME:.metadata.name,TAINTS:.spec.taints`
+
+<img width="667" height="100" alt="image" src="https://github.com/user-attachments/assets/ff472692-3534-4443-8d04-c2941bdc1a28" />
+
+### Create a Deployment ###
+
+`vi nginx-deployment.yaml`
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:latest
+          ports:
+            - containerPort: 80
+
+
+
+
 
 
 
