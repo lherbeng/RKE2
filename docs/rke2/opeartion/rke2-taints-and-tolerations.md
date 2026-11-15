@@ -6,7 +6,7 @@
 
 <img width="664" height="99" alt="image" src="https://github.com/user-attachments/assets/a5d8d683-40f5-46b3-9ac0-77fca6a78fb8" />
 
-This command displays the taints assigned to each node.
+### This command displays the taints assigned to each node. ###
 
 ## Check the control-plane label ## 
 
