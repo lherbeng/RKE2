@@ -83,18 +83,17 @@
 
 <img width="724" height="69" alt="image" src="https://github.com/user-attachments/assets/608b47ca-ceeb-4460-8565-f638e08e19ec" />
 
-### Required: Kubernetes only schedules the Pod on workernode1. ###
+### Required: Kubernetes schedules the Pod only on nodes with the disktype=ssd label. In this test, the Pod should be scheduled on workernode2. However, if no eligible node has the disktype=ssd label, the Pod will remain in Pending status. ###
 
+`kubectl apply -f pod-nginx-required-affinity.yaml`
 
+<img width="646" height="48" alt="image" src="https://github.com/user-attachments/assets/59bb8ea0-dafc-4dbc-a8c7-fc3f64198f3c" />
 
+`kubectl get po -o wide` 
 
+`kubectl get pods --output=wide`
 
-
-
-
-
-
-
+<img width="670" height="118" alt="image" src="https://github.com/user-attachments/assets/901f11b7-6e4d-4949-9d03-d1c43bc6bfc0" />
 
 
 
