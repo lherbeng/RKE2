@@ -59,7 +59,31 @@
 
 <img width="720" height="70" alt="image" src="https://github.com/user-attachments/assets/5b581271-f159-49a0-b5bc-1f9fc2f34bee" />
 
+## Expected behavior: ##
 
+### To remove the disktype=ssd label from workernode1, use: ###
+
+`kubectl label nodes workernode2 disktype-`
+
+<img width="588" height="36" alt="image" src="https://github.com/user-attachments/assets/e89a5d76-a281-436f-8096-665fcfec8ea0" />
+
+### Verify that the label was removed ###
+
+`kubectl get node workernode2 -L disktype`
+
+<img width="586" height="75" alt="image" src="https://github.com/user-attachments/assets/561a8fd2-5ab3-44ad-8299-4c1668492aa9" />
+
+### Preferred: Kubernetes favors workernode2, but can schedule the Pod on another eligible node if no node with the disktype=ssd label is available. ###
+
+`kubectl apply -f pod-nginx-preferred-affinity.yaml`
+
+<img width="649" height="55" alt="image" src="https://github.com/user-attachments/assets/0d9079b0-f942-4d90-99e2-30eff5bf159e" />
+
+`kubectl get po -o wide`
+
+<img width="724" height="69" alt="image" src="https://github.com/user-attachments/assets/608b47ca-ceeb-4460-8565-f638e08e19ec" />
+
+### Required: Kubernetes only schedules the Pod on workernode1. ###
 
 
 
