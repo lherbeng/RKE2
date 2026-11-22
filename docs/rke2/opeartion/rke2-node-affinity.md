@@ -25,13 +25,24 @@
 
 `vi pod-nginx-required-affinity.yaml`
 
-<img width="652" height="49" alt="image" src="https://github.com/user-attachments/assets/09f7b9a5-ce03-4f1b-9d0c-6573990ea2a4" />
+<img width="481" height="313" alt="image" src="https://github.com/user-attachments/assets/19733564-a697-4ae5-bda9-253b65d21318" />
 
 ### Apply the manifest to create a Pod that is scheduled onto your chosen node: ###
 
 `kubectl apply -f pod-nginx-required-affinity.yaml`
 
-<img width="481" height="313" alt="image" src="https://github.com/user-attachments/assets/19733564-a697-4ae5-bda9-253b65d21318" />
+<img width="652" height="49" alt="image" src="https://github.com/user-attachments/assets/09f7b9a5-ce03-4f1b-9d0c-6573990ea2a4" />
+
+### Verify that the pod is running on your chosen node: ###
+
+`kubectl get pods --output=wide`
+
+<img width="739" height="67" alt="image" src="https://github.com/user-attachments/assets/e9d27c4d-6d2f-431c-a277-238ded62ac64" />
+
+
+
+
+
 
 
 
