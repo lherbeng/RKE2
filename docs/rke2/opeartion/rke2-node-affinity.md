@@ -1,4 +1,3 @@
-## https://kubernetes.io/docs/tasks/configure-pod-container/assign-pods-nodes-using-node-affinity/ ##
 
 ## Add a label to a node ## 
 
@@ -19,6 +18,28 @@
 `kubectl get nodes --show-labels | grep disktype`
 
 <img width="1056" height="55" alt="image" src="https://github.com/user-attachments/assets/27f16c05-a893-49ce-b559-c4c44ca58eac" />
+
+## Schedule a Pod using required node affinity ##
+
+### This manifest describes a Pod that has a requiredDuringSchedulingIgnoredDuringExecution node affinity,disktype: ssd. This means that the pod will get scheduled only on a node that has a disktype=ssd label. ###
+
+`vi pod-nginx-required-affinity.yaml`
+
+<img width="652" height="49" alt="image" src="https://github.com/user-attachments/assets/09f7b9a5-ce03-4f1b-9d0c-6573990ea2a4" />
+
+### Apply the manifest to create a Pod that is scheduled onto your chosen node: ###
+
+`kubectl apply -f pod-nginx-required-affinity.yaml`
+
+<img width="481" height="313" alt="image" src="https://github.com/user-attachments/assets/19733564-a697-4ae5-bda9-253b65d21318" />
+
+
+
+
+
+
+
+## https://kubernetes.io/docs/tasks/configure-pod-container/assign-pods-nodes-using-node-affinity/ ##
 
 
 
