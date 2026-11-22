@@ -1,3 +1,5 @@
+## https://kubernetes.io/docs/tasks/configure-pod-container/assign-pods-nodes-using-node-affinity/ ##
+
 ## Add a label to a node ## 
 
 ### List the nodes in your cluster, along with their labels: ###
