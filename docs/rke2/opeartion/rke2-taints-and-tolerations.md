@@ -72,6 +72,19 @@
 
 <img width="1140" height="48" alt="image" src="https://github.com/user-attachments/assets/db12fa40-5106-4ccc-bc34-b27aabdd1f74" />
 
+#### Verify Deployment and Pod Placement ####
+
+### Check Deployment status: ###
+
+`kubectl get deployments`
+
+<img width="484" height="49" alt="image" src="https://github.com/user-attachments/assets/3a47e87a-22e2-46f0-819f-389426b999dd" />
+
+
+
+
+
+
 
 
 
