@@ -100,7 +100,34 @@
 
 #### To target a specific node, a nodeSelector or node affinity must also be configured. ####
 
-## Cleanup ##
+### Cleanup ###
+
+### Delete the test Deployments: ###
+
+`kubectl delete -f nginx-deployment.yaml`
+
+`kubectl delete -f nginx-toleration.yaml`
+
+<img width="613" height="88" alt="image" src="https://github.com/user-attachments/assets/81ad5bc5-b289-4bcd-9a0b-c58a1dbf271f" />
+
+### Remove the NoSchedule taint from the control-plane node: ###
+
+`kubectl taint nodes masternode node-role.kubernetes.io/control-plane:NoSchedule-`
+
+<img width="877" height="43" alt="image" src="https://github.com/user-attachments/assets/8ea0ffb0-f9df-4acd-b767-b9b272730e3e" />
+
+### Verify that the taint has been removed: ###
+
+`kubectl get nodes -o custom-columns=NAME:.metadata.name,TAINTS:.spec.taints`
+
+<img width="847" height="100" alt="image" src="https://github.com/user-attachments/assets/b9528172-1f9f-4d7c-9b0e-0bf670cb2e92" />
+
+
+
+
+
+
+
 
 
 
