@@ -72,13 +72,37 @@
 
 <img width="1140" height="48" alt="image" src="https://github.com/user-attachments/assets/db12fa40-5106-4ccc-bc34-b27aabdd1f74" />
 
-#### Verify Deployment and Pod Placement ####
+### Verify Deployment and Pod Placement ###
 
 ### Check Deployment status: ###
 
 `kubectl get deployments`
 
 <img width="484" height="49" alt="image" src="https://github.com/user-attachments/assets/3a47e87a-22e2-46f0-819f-389426b999dd" />
+
+### Verify rollout status: ###
+
+`kubectl rollout status deployment/nginx-toleration`
+
+<img width="673" height="52" alt="image" src="https://github.com/user-attachments/assets/31e40791-bb9d-4565-baae-d579a633ae25" />
+
+### Check pod placement: ###
+
+`kubectl get pods -o wide`
+
+<img width="925" height="87" alt="image" src="https://github.com/user-attachments/assets/979b9147-8761-4db3-8114-a30025bbf63d" />
+
+### Understanding Toleration Behavior ###
+
+#### A toleration allows a Pod to be scheduled on a node with a matching taint, but it does not guarantee placement on that node. ####
+
+#### In this test, the three NGINX replicas were distributed across the worker nodes and the masternode. This confirms that the toleration allows Pods to run on a node with a NoSchedule taint. ####
+
+#### To target a specific node, a nodeSelector or node affinity must also be configured. ####
+
+
+
+
 
 
 
