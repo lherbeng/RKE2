@@ -39,6 +39,32 @@
 
 <img width="739" height="67" alt="image" src="https://github.com/user-attachments/assets/e9d27c4d-6d2f-431c-a277-238ded62ac64" />
 
+## Schedule a Pod using preferred node affinity ## 
+
+### This manifest describes a Pod that has a preferredDuringSchedulingIgnoredDuringExecution node affinity,disktype: ssd. This means that the pod will prefer a node that has a disktype=ssd label. ###
+
+`vi pod-nginx-preferred-affinity.yaml`
+
+<img width="408" height="328" alt="image" src="https://github.com/user-attachments/assets/284c7438-9bc5-40de-9f27-9f7b41a03685" />
+
+### Apply the manifest to create a Pod that is scheduled onto your chosen node: ###
+
+`kubectl apply -f pod-nginx-preferred-affinity.yaml`
+
+<img width="651" height="49" alt="image" src="https://github.com/user-attachments/assets/a0863dbc-5437-46c8-ad3c-6720e44116f5" />
+
+### Verify that the pod is running on your chosen node: ###
+
+`kubectl get pods --output=wide`
+
+<img width="720" height="70" alt="image" src="https://github.com/user-attachments/assets/5b581271-f159-49a0-b5bc-1f9fc2f34bee" />
+
+
+
+
+
+
+
 
 
 
