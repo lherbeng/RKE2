@@ -45,6 +45,7 @@ Explanation:
 
 `kubectl get pv pvc-46785703-5e51-4f29-8388-9fa7bf85d130 -o yaml`
 
+<details>
 <summary>Click to view important fields</summary>
 
 ```yaml
