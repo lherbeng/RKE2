@@ -25,6 +25,12 @@
 
 ## Create mssql.yaml ##
 
+`vi mssql.yaml`
+
+`kubectl apply -f mssql.yaml`
+
+<img width="426" height="82" alt="image" src="https://github.com/user-attachments/assets/28ae31c5-ba2d-486d-bf72-1acbbad68db5" />
+
 <details>
 <summary>Click to view MSSQL YAML configuration</summary>
 
