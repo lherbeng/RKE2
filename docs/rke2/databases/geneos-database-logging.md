@@ -1,3 +1,9 @@
+## Verify MSSQL Connectivity ## 
+
+`nc -zv 192.168.68.5 31433`
+
+<img width="396" height="54" alt="image" src="https://github.com/user-attachments/assets/92292833-e720-41b3-a484-3afb39640502" />
+
 ## Create GeneosLogging database ##
 
 #### Open SSMS sa Windows. ####
@@ -36,4 +42,6 @@ WHERE name = 'GeneosLogging';
 ```
 
 </details>
+
+<img width="1165" height="480" alt="image" src="https://github.com/user-attachments/assets/cf116577-60f4-4ad4-9373-cb3278074789" />
 
