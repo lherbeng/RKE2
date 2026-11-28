@@ -19,6 +19,40 @@ Explanation:
 - 1433 – MSSQL default port.
 - 31433 – Configured NodePort.
 
+## Verify PersistentVolumeClaim (PVC) ##
+
+`kubectl get pvc -n database`
+
+<img width="1009" height="75" alt="image" src="https://github.com/user-attachments/assets/8aba86fb-6b32-474a-b795-43a21d7ef0d4" />
+
+### Purpose: Verify that MSSQL successfully requested and received persistent storage. ###
+
+Explanation:
+- Bound – PVC successfully connected to a PersistentVolume.
+- 5Gi – Requested storage capacity.
+- RWO – ReadWriteOnce access mode.
+- local-path – StorageClass used by MSSQL.
+
+## Verify PersistentVolume (PV) ##
+
+`kubectl get pv`
+
+<img width="1087" height="103" alt="image" src="https://github.com/user-attachments/assets/ef683ef8-dc4e-4ff5-979f-c8387e32ff79" />
+
+### Purpose: List available PersistentVolumes in the Kubernetes cluster. ###
+
+### To inspect the specific MSSQL PV: ###
+
+`kubectl get pv pvc-46785703-5e51-4f29-8388-9fa7bf85d130 -o yaml`
+
+<img width="780" height="727" alt="image" src="https://github.com/user-attachments/assets/bb26eb3d-41ca-4635-9fc5-0ce58bc14284" />
+
+Explanation:
+- selected-node – Node where storage was provisioned.
+- hostPath – Actual directory on the node.
+- nodeAffinity – Restricts the volume to its associated node.
+- Delete – Volume data may be deleted when the PVC is deleted.
+
 
 
 
