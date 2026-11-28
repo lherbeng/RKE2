@@ -45,6 +45,31 @@ Explanation:
 
 `kubectl get pv pvc-46785703-5e51-4f29-8388-9fa7bf85d130 -o yaml`
 
+<summary>Click to view important fields</summary>
+
+```yaml
+metadata:
+  annotations:
+    local.path.provisioner/selected-node: masternode
+
+spec:
+  hostPath:
+    path: /opt/local-path-provisioner/...
+
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          values:
+          - masternode
+
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: local-path
+```
+
+</details>
+
 <img width="780" height="727" alt="image" src="https://github.com/user-attachments/assets/bb26eb3d-41ca-4635-9fc5-0ce58bc14284" />
 
 Explanation:
