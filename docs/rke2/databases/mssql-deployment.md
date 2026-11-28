@@ -11,9 +11,10 @@
 
 `kubectl create secret generic mssql-secret \
   --namespace database \
-  --from-literal=MSSQL_SA_PASSWORD='admin'`
+  --from-literal=MSSQL_SA_PASSWORD='Admin@Rhel'`
 
-<img width="562" height="85" alt="image" src="https://github.com/user-attachments/assets/e0d5f9b2-d371-4489-bfeb-ee803fea6ee6" />
+<img width="550" height="88" alt="image" src="https://github.com/user-attachments/assets/67f9a43d-d83c-4a5a-a4c3-27e516bcc4c9" />
+
 
 ### Note: Replace the example password with your own strong password. SQL Server requires a strong SA password. ###
 
@@ -175,6 +176,44 @@ spec:
 <img width="493" height="66" alt="image" src="https://github.com/user-attachments/assets/efd2ebcf-37fe-4dc3-a2ce-bee28b66bf2a" />
 
 ## Validate the deployment ## 
+
+### Check the Pod: ###
+
+`kubectl get pods -n database -o wide`
+
+<img width="742" height="67" alt="image" src="https://github.com/user-attachments/assets/5cac11c5-c04e-440b-88ef-a835a944ab24" />
+
+### Check PVC: ###
+
+`kubectl get pvc -n database`
+
+<img width="994" height="67" alt="image" src="https://github.com/user-attachments/assets/584c02e0-4d5a-4885-898e-bbb2c68f4dcc" />
+
+### Check PV: ###
+
+`kubectl get pv`
+
+<img width="1081" height="100" alt="image" src="https://github.com/user-attachments/assets/a14e8f95-d681-4c33-a051-50829a50ff57" />
+
+### Check Services: ###
+
+`kubectl get svc -n database` 
+
+<img width="568" height="90" alt="image" src="https://github.com/user-attachments/assets/625eb02d-5263-478d-8386-d4a1ac6a628c" />
+
+
+### Check logs: ###
+
+`kubectl logs -n database mssql-0`
+
+<img width="1090" height="588" alt="image" src="https://github.com/user-attachments/assets/1eeed440-cf25-4c4e-8141-b433abf36750" />
+
+
+
+
+
+
+
 
 
 
