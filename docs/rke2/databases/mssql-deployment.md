@@ -27,9 +27,6 @@
 
 `vi mssql.yaml`
 
-`kubectl apply -f mssql.yaml`
-
-
 <details>
 <summary>Click to view MSSQL YAML configuration</summary>
 
@@ -137,7 +134,46 @@ spec:
 
 </details>
 
+### Deploy MSSQL ###
+
+`kubectl apply -f mssql.yaml`
+
 <img width="426" height="82" alt="image" src="https://github.com/user-attachments/assets/0709ec48-19ef-40a2-a681-96935e0f53f1" />
+
+## Create mssql-nodeport.yaml ##
+
+`vi mssql-nodeport.yaml`
+
+<details>
+<summary>Click to view MSSQL Nodeport YAML configuration</summary>
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: mssql-nodeport
+  namespace: database
+spec:
+  type: NodePort
+  selector:
+    app: mssql
+  ports:
+    - name: sql
+      port: 1433
+      targetPort: 1433
+      nodePort: 31433
+```
+
+</details>
+
+### Note: This allows you to access SQL Server from your Windows laptop, assuming your network and firewall allow access. ###
+
+### Deploy MSSQL Nodeport ###
+
+`kubectl apply -f mssql-nodeport.yaml`
+
+<img width="493" height="66" alt="image" src="https://github.com/user-attachments/assets/efd2ebcf-37fe-4dc3-a2ce-bee28b66bf2a" />
+
 
 
 
