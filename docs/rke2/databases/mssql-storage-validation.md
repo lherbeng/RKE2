@@ -79,6 +79,35 @@ Explanation:
 - nodeAffinity – Restricts the volume to its associated node.
 - Delete – Volume data may be deleted when the PVC is deleted.
 
+## Verify MSSQL Volume Mount ##
+
+` kubectl describe pod mssql-0 -n database`
+
+<img width="595" height="55" alt="image" src="https://github.com/user-attachments/assets/b9ff1ed9-5185-4935-b61b-0f324b3000d9" />
+
+Explanation:
+- /var/opt/mssql – SQL Server data directory.
+- mssql-data – Kubernetes volume name.
+- rw – Read and Write access.
+
+### This confirms that the MSSQL container mounts the PVC at its SQL Server data directory. ###
+
+## Verify Node Disk Capacity ##
+
+### Run this command directly on the node hosting MSSQL: ###
+
+`df -h`
+
+### Purpose: Check the available disk space and filesystem utilization. ###
+
+<img width="493" height="118" alt="image" src="https://github.com/user-attachments/assets/d95f5e8d-3f35-4aa5-914a-87076d0dd1c9" />
+
+Explanation:
+- Size – Total filesystem capacity.
+- Used – Used disk space.
+- Avail – Available disk space.
+- Use% – Percentage of disk utilization.
+
 
 
 
