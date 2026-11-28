@@ -11,7 +11,7 @@
 
 <img width="745" height="70" alt="image" src="https://github.com/user-attachments/assets/8eb8aa49-a153-495b-8d52-26808f1b39e6" />
 
-### Purpose: Check the Kubernetes Services exposed by MSSQL. ###
+#### Purpose: Check the Kubernetes Services exposed by MSSQL. ####
 
 Explanation:
 - mssql – Internal Kubernetes service.
@@ -25,7 +25,7 @@ Explanation:
 
 <img width="1009" height="75" alt="image" src="https://github.com/user-attachments/assets/8aba86fb-6b32-474a-b795-43a21d7ef0d4" />
 
-### Purpose: Verify that MSSQL successfully requested and received persistent storage. ###
+#### Purpose: Verify that MSSQL successfully requested and received persistent storage. ####
 
 Explanation:
 - Bound – PVC successfully connected to a PersistentVolume.
@@ -39,9 +39,9 @@ Explanation:
 
 <img width="1087" height="103" alt="image" src="https://github.com/user-attachments/assets/ef683ef8-dc4e-4ff5-979f-c8387e32ff79" />
 
-### Purpose: List available PersistentVolumes in the Kubernetes cluster. ###
+#### Purpose: List available PersistentVolumes in the Kubernetes cluster. ####
 
-### To inspect the specific MSSQL PV: ###
+#### To inspect the specific MSSQL PV: ####
 
 `kubectl get pv pvc-46785703-5e51-4f29-8388-9fa7bf85d130 -o yaml`
 
@@ -90,7 +90,7 @@ Explanation:
 - mssql-data – Kubernetes volume name.
 - rw – Read and Write access.
 
-### This confirms that the MSSQL container mounts the PVC at its SQL Server data directory. ###
+#### This confirms that the MSSQL container mounts the PVC at its SQL Server data directory. ####
 
 ## Verify Node Disk Capacity ##
 
@@ -98,7 +98,7 @@ Explanation:
 
 `df -h`
 
-### Purpose: Check the available disk space and filesystem utilization. ###
+#### Purpose: Check the available disk space and filesystem utilization. ####
 
 <img width="493" height="118" alt="image" src="https://github.com/user-attachments/assets/d95f5e8d-3f35-4aa5-914a-87076d0dd1c9" />
 
