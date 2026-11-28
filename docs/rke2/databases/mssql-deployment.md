@@ -208,6 +208,13 @@ spec:
 
 <img width="1090" height="588" alt="image" src="https://github.com/user-attachments/assets/1eeed440-cf25-4c4e-8141-b433abf36750" />
 
+## If the Pod is not yet running, check: ##
+
+`kubectl describe pod mssql-0 -n database`
+
+<img width="1095" height="148" alt="image" src="https://github.com/user-attachments/assets/846943a5-b3a0-4013-9c37-7235746fcc12" />
+
+
 
 
 
