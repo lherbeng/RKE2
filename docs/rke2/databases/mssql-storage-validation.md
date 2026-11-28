@@ -94,7 +94,7 @@ Explanation:
 
 ## Verify Node Disk Capacity ##
 
-### Run this command directly on the node hosting MSSQL: ###
+#### Run this command directly on the node hosting MSSQL: ####
 
 `df -h`
 
